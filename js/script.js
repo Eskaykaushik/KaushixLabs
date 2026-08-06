@@ -10,29 +10,12 @@ const commandElement = document.getElementById("command");
 const output = document.getElementById("terminal-output");
 
 const lines = [
-
-"",
-
-"Loading AI Research Modules...",
-
-"✓ Artificial Intelligence",
-
-"✓ Machine Learning",
-
-"✓ Agentic AI",
-
-"✓ Generative AI",
-
-"✓ Enterprise Consultancy",
-
-"",
-
-"System Ready.",
-
-"",
-
-"Welcome to Kaushix Labs"
-
+    "",
+    "Research",
+    "Training",
+    "Enterprise Consultancy",
+    "",
+    "Welcome to Kaushix Labs"
 ];
 
 let index = 0;
