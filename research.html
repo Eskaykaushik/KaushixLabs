@@ -2,205 +2,67 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Research | Kaushix Labs</title>
 
     <link rel="stylesheet" href="css/styles.css">
-
 </head>
 
 <body>
 
-<header>
+    <header>
 
-    <div class="container navbar">
+        <div class="container navbar">
 
-        <a href="index.html" class="logo">
-
-            <span class="green">$</span> Kaushix Labs
-
-        </a>
-
-        <nav>
-
-
-
-            <a href="research.html" class="active">Research</a>
-
-
-
-
-
-            <a href="about.html">About</a>
-
-            <a href="contact.html">Contact</a>
-
-        </nav>
-
-    </div>
-
-</header>
-
-<main class="page">
-
-    <div class="container">
-
-        <section class="page-hero">
-
-            <p class="terminal-path">$ cd research/</p>
-
-            <h1>Research Projects</h1>
-
-            <p class="page-description">
-                We develop practical AI systems that solve real-world problems across
-                enterprise automation, intelligent agents, computer vision, knowledge
-                representation, and generative AI.
-            </p>
-
-        </section>
-
-        <section class="research-grid">
-
-            <a href="research/sar-automation.html" class="research-card">
-
-                <div class="terminal-bar">
-                    <span class="dot green"></span>
-                    <span class="terminal-title">research://sar-automation</span>
-                </div>
-
-                <div class="card-content">
-
-                    <span class="status active">ACTIVE</span>
-
-                    <h3>SAR Automation Platform</h3>
-
-                    <p>
-                        Multi-agent AI platform for automated Suspicious Activity Report
-                        generation using LLMs, RAG pipelines, enterprise knowledge retrieval
-                        and intelligent quality assurance.
-                    </p>
-
-                    <div class="tags">
-
-                        <span>Agentic AI</span>
-                        <span>Azure OpenAI</span>
-                        <span>LangGraph</span>
-                        <span>RAG</span>
-
-                    </div>
-
-                    <span class="card-link">$ open project</span>
-
-                </div>
-
+            <a href="index.html" class="logo">
+                <span class="green">$</span> Kaushix Labs
             </a>
 
-            <a href="research/policy-graph.html" class="research-card">
+            <nav>
+                <a href="research.html" class="active">Research</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </nav>
 
-                <div class="terminal-bar">
-                    <span class="dot green"></span>
-                    <span class="terminal-title">research://policy-graph</span>
+        </div>
+
+    </header>
+
+    <main class="page">
+
+        <div class="container">
+
+            <section class="page-hero">
+
+                <p class="terminal-path">$ cd research/</p>
+
+                <h1>Research Projects</h1>
+
+                <p class="page-description">
+                    We develop practical AI systems that solve real-world problems across
+                    enterprise automation, intelligent agents, computer vision,
+                    knowledge representation, and generative AI.
+                </p>
+
+            </section>
+
+            <!-- Projects are rendered dynamically from data/projects.json -->
+            <section id="research-grid" class="research-grid">
+
+                <div class="research-loading">
+                    <p>$ loading research projects...</p>
                 </div>
 
-                <div class="card-content">
+            </section>
 
-                    <span class="status active">ACTIVE</span>
+        </div>
 
-                    <h3>Policy Knowledge Graph</h3>
+    </main>
 
-                    <p>
-                        Graph-based policy intelligence for analysing regulatory impact,
-                        enterprise relationships and downstream business dependencies.
-                    </p>
-
-                    <div class="tags">
-
-                        <span>Neo4j</span>
-                        <span>Knowledge Graphs</span>
-                        <span>FastAPI</span>
-
-                    </div>
-
-                    <span class="card-link">$ open project</span>
-
-                </div>
-
-            </a>
-
-            <a href="research/infrared-generation.html" class="research-card">
-
-                <div class="terminal-bar">
-                    <span class="dot green"></span>
-                    <span class="terminal-title">research://infrared-generation</span>
-                </div>
-
-                <div class="card-content">
-
-                    <span class="status completed">COMPLETED</span>
-
-                    <h3>Infrared Image Generation</h3>
-
-                    <p>
-                        Deep learning framework for translating RGB imagery into infrared
-                        representations using encoder-decoder neural networks.
-                    </p>
-
-                    <div class="tags">
-
-                        <span>Computer Vision</span>
-                        <span>TensorFlow</span>
-                        <span>Keras</span>
-
-                    </div>
-
-                    <span class="card-link">$ open project</span>
-
-                </div>
-
-            </a>
-
-            <a href="research/agent-evaluation.html" class="research-card">
-
-                <div class="terminal-bar">
-                    <span class="dot green"></span>
-                    <span class="terminal-title">research://agent-evaluation</span>
-                </div>
-
-                <div class="card-content">
-
-                    <span class="status ongoing">ONGOING</span>
-
-                    <h3>Agent Evaluation Framework</h3>
-
-                    <p>
-                        Benchmarking autonomous AI agents for planning, reasoning,
-                        orchestration, memory and enterprise tool usage.
-                    </p>
-
-                    <div class="tags">
-
-                        <span>LLMs</span>
-                        <span>Evaluation</span>
-                        <span>Agents</span>
-
-                    </div>
-
-                    <span class="card-link">$ open project</span>
-
-                </div>
-
-            </a>
-
-        </section>
-
-    </div>
-
-</main>
-<script src="js/script.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/research.js"></script>
 
 </body>
 
