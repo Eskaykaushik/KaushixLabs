@@ -163,6 +163,29 @@ nav .active{
 
 }
 
+@media (max-width: 768px) {
+
+    .navbar {
+
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: auto;
+        gap: 1rem;
+        padding: 1rem 0;
+
+    }
+
+    nav {
+
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.25rem;
+
+    }
+
+}
+
 /* ==========================================
    Hero
 ========================================== */
@@ -424,10 +447,6 @@ justify-content:center;
 
 }
 
-nav{
 
-display:none;
-
-}
 
 }
