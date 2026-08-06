@@ -446,7 +446,310 @@ text-align:center;
 justify-content:center;
 
 }
+}
 
 
+
+/* ==========================================
+   RESEARCH PAGE
+========================================== */
+
+.page-hero{
+
+    margin:4rem 0;
+
+}
+
+.terminal-path{
+
+    font-family:"JetBrains Mono",monospace;
+
+    color:var(--green);
+
+    margin-bottom:1rem;
+
+}
+
+.page-hero h1{
+
+    font-size:3rem;
+
+    margin-bottom:1rem;
+
+}
+
+.page-description{
+
+    max-width:700px;
+
+    color:var(--muted);
+
+    line-height:1.8;
+
+}
+
+
+/* ==========================================
+   RESEARCH GRID
+========================================== */
+
+.research-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+
+    gap:2rem;
+
+    margin:4rem 0 6rem;
+
+}
+
+
+/* ==========================================
+   RESEARCH CARD
+========================================== */
+
+.research-card{
+
+    display:block;
+
+    text-decoration:none;
+
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    transition:.3s;
+
+}
+
+.research-card:hover{
+
+    transform:translateY(-6px);
+
+    border-color:var(--green);
+
+    box-shadow:0 15px 35px rgba(0,0,0,.18);
+
+}
+
+
+/* ==========================================
+   TERMINAL BAR
+========================================== */
+
+.terminal-bar{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:.8rem;
+
+    padding:.9rem 1rem;
+
+    border-bottom:1px solid var(--border);
+
+    background:rgba(255,255,255,.02);
+
+}
+
+.dot{
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:50%;
+
+}
+
+.dot.green{
+
+    background:var(--green);
+
+}
+
+.terminal-title{
+
+    font-family:"JetBrains Mono",monospace;
+
+    font-size:.85rem;
+
+    color:var(--muted);
+
+    transition:.3s;
+
+}
+
+
+/* ==========================================
+   CARD CONTENT
+========================================== */
+
+.card-content{
+
+    padding:1.5rem;
+
+}
+
+.card-content h3{
+
+    margin:1rem 0;
+
+    color:var(--text);
+
+    transition:.3s;
+
+}
+
+.card-content p{
+
+    color:var(--muted);
+
+    line-height:1.7;
+
+    margin-bottom:1.5rem;
+
+}
+
+
+/* ==========================================
+   STATUS BADGES
+========================================== */
+
+.status{
+
+    display:inline-block;
+
+    padding:.3rem .8rem;
+
+    border-radius:999px;
+
+    font-size:.75rem;
+
+    font-weight:600;
+
+    letter-spacing:.05em;
+
+}
+
+.status.active{
+
+    background:rgba(34,197,94,.12);
+
+    color:var(--green);
+
+}
+
+.status.completed{
+
+    background:rgba(59,130,246,.12);
+
+    color:#60a5fa;
+
+}
+
+.status.ongoing{
+
+    background:rgba(251,191,36,.12);
+
+    color:#fbbf24;
+
+}
+
+
+/* ==========================================
+   TAGS
+========================================== */
+
+.tags{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:.6rem;
+
+    margin-bottom:1.5rem;
+
+}
+
+.tags span{
+
+    font-size:.75rem;
+
+    padding:.35rem .75rem;
+
+    border:1px solid var(--border);
+
+    border-radius:999px;
+
+    color:var(--muted);
+
+    font-family:"JetBrains Mono",monospace;
+
+}
+
+
+/* ==========================================
+   OPEN PROJECT
+========================================== */
+
+.card-link{
+
+    display:inline-block;
+
+    font-family:"JetBrains Mono",monospace;
+
+    color:var(--green);
+
+    transition:.3s;
+
+}
+
+.research-card:hover .card-link{
+
+    transform:translateX(6px);
+
+}
+
+.research-card:hover .terminal-title,
+
+.research-card:hover h3{
+
+    color:var(--green);
+
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media(max-width:768px){
+
+    .page-hero{
+
+        margin:2rem 0;
+
+    }
+
+    .page-hero h1{
+
+        font-size:2.2rem;
+
+    }
+
+    .research-grid{
+
+        grid-template-columns:1fr;
+
+    }
 
 }

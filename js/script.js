@@ -81,7 +81,7 @@ function setTheme(theme) {
     localStorage.setItem("theme", theme);
 
     // Update button icon
-    themeToggle.textContent = theme === "dark" ? "☾" : "☀";
+    themeToggle.textContent = theme === "dark" ? "☀" : "☾";
 
 }
 
