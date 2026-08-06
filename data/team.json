@@ -1,0 +1,38 @@
+{
+  "members": [
+    {
+      "id": "shubham-kaushik",
+      "name": "Shubham Kaushik",
+      "role": "Founder & AI Researcher",
+      "bio": "Working on Agentic AI, Large Language Models, Computer Vision and Enterprise AI Systems.",
+      "photo": "images/shubhamKaushikProfilePic.jpg",
+      "expertise": [
+        "Generative AI",
+        "Agentic AI",
+        "Computer Vision",
+        "Knowledge Graphs"
+      ],
+      "socials": {
+        "github": "https://github.com/...",
+        "linkedin": "https://linkedin.com/in/...",
+        "website": "https://..."
+      }
+    },
+    {
+      "id": "jane-doe",
+      "name": "Jane Doe",
+      "role": "Research Intern",
+      "bio": "Interested in multimodal AI and reinforcement learning.",
+      "photo": "images/team/jane-doe.jpg",
+      "expertise": [
+        "Python",
+        "Deep Learning",
+        "PyTorch"
+      ],
+      "socials": {
+        "github": "",
+        "linkedin": ""
+      }
+    }
+  ]
+}
