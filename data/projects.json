@@ -1,0 +1,62 @@
+ 
+{
+  "projects": [
+    {
+      "id": "contractkit",
+      "title": "ContractKit",
+      "category": "Legal AI • Agentic AI",
+      "status": "Completed",
+      "year": "2026",
+      "featured": true,
+      "description": "An AI-powered contract intelligence platform that automates contract review, clause extraction, policy validation, and compliance analysis using large language models and retrieval-augmented generation.",
+      "highlights": [
+        "Clause extraction and semantic search",
+        "Policy compliance validation",
+        "Retrieval-Augmented Generation (RAG)",
+        "Agentic document analysis workflow"
+      ],
+      "technologies": [
+        "Python",
+        "LangChain",
+        "Azure OpenAI",
+        "RAG",
+        "Vector Database",
+        "FastAPI",
+        "React"
+      ],
+      "links": {
+        "paper": "",
+        "github": "",
+        "demo": ""
+      }
+    },
+    {
+      "id": "beyond-vision",
+      "title": "Beyond Vision: RGB to Infrared Image Translation",
+      "category": "Computer Vision • Deep Learning",
+      "status": "Research",
+      "year": "2025",
+      "featured": true,
+      "description": "A deep learning framework for generating infrared imagery from RGB images using encoder-decoder architectures. The project explores cross-spectrum image translation for surveillance, autonomous systems, and low-light perception.",
+      "highlights": [
+        "RGB → Infrared image synthesis",
+        "Trained on KAIST and FLAME datasets",
+        "Evaluated using PSNR, SSIM and MSE",
+        "Research conducted as M.Tech thesis"
+      ],
+      "technologies": [
+        "Python",
+        "TensorFlow",
+        "Keras",
+        "OpenCV",
+        "NumPy",
+        "Matplotlib"
+      ],
+      "links": {
+        "paper": "",
+        "github": "",
+        "demo": ""
+      }
+    }
+  ]
+}

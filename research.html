@@ -2,66 +2,67 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Research | Kaushix Labs</title>
 
     <link rel="stylesheet" href="css/styles.css">
-
 </head>
 
 <body>
 
-<header>
+    <header>
 
-    <div class="container navbar">
+        <div class="container navbar">
 
-        <a href="index.html" class="logo">
+            <a href="index.html" class="logo">
+                <span class="green">$</span> Kaushix Labs
+            </a>
 
-            <span class="green">$</span> Kaushix Labs
+            <nav>
+                <a href="research.html" class="active">Research</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </nav>
 
-        </a>
+        </div>
 
-        <nav>
+    </header>
 
-            <a href="index.html">Home</a>
+    <main class="page">
 
-            <a href="research.html" class="active">Research</a>
+        <div class="container">
 
-            <a href="training.html">Training</a>
+            <section class="page-hero">
 
-            <a href="consultancy.html">Consultancy</a>
+                <p class="terminal-path">$ cd research/</p>
 
-            <a href="about.html">About</a>
+                <h1>Research Projects</h1>
 
-            <a href="contact.html">Contact</a>
+                <p class="page-description">
+                    We develop practical AI systems that solve real-world problems across
+                    enterprise automation, intelligent agents, computer vision,
+                    knowledge representation, and generative AI.
+                </p>
 
-        </nav>
+            </section>
 
-    </div>
+            <!-- Projects are rendered dynamically from data/projects.json -->
+            <section id="research-grid" class="research-grid">
 
-</header>
+                <div class="research-loading">
+                    <p>$ loading research projects...</p>
+                </div>
 
-<main class="page">
+            </section>
 
-    <div class="container">
+        </div>
 
-        <h1>$ cd research/</h1>
+    </main>
 
-        <p>
-            Kaushix Labs conducts applied and industrial research in Artificial Intelligence,
-            Machine Learning, Computer Vision, Large Language Models, Agentic AI,
-            Knowledge Graphs and Enterprise Automation.
-        </p>
-
-    </div>
-
-</main>
-
-<script src="js/script.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/research.js"></script>
 
 </body>
 
