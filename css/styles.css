@@ -100,7 +100,7 @@ header{
 
     z-index:999;
 
-    background:#0d1117dd;
+    background: var(--bg);
 
     backdrop-filter:blur(15px);
 
@@ -127,6 +127,7 @@ header{
     font-size:1.1rem;
 
     font-weight:700;
+    color: var(--text);
 
 }
 
@@ -138,7 +139,9 @@ header{
 
 nav{
 
-    display:flex;
+   display:flex;
+
+    align-items:center;
 
     gap:35px;
 
@@ -239,21 +242,17 @@ nav .active{
 
 .theme-toggle{
 
-    background:none;
-
-    border:1px solid var(--border);
-
-    color:var(--muted);
-
-    padding:6px 16px;
-
-    border-radius:8px;
-
-    font:inherit;
-
-    cursor:pointer;
-
-    transition:.3s;
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font: inherit;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 1rem;
+    opacity: 0.7;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
 
 }
 

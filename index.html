@@ -20,6 +20,12 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="css/styles.css">
+    <script>
+    document.documentElement.setAttribute(
+        "data-theme",
+        localStorage.getItem("theme") || "dark"
+    );
+</script>
 
 </head>
 
@@ -52,6 +58,9 @@
                 <a href="about.html">About</a>
 
                 <a href="contact.html">Contact</a>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    ☾
+                </button>
 
             </nav>
 
