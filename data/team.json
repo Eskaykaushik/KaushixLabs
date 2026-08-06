@@ -33,6 +33,23 @@
         "github": "",
         "linkedin": ""
       }
+    },
+    {
+      "id": "gungun-gupta",
+      "name": "Gungun Gupta",
+      "role": "Founder & AI Researcher",
+      "bio": "Working on Agentic AI, Large Language Models, Computer Vision and Enterprise AI Systems.",
+      "photo": "images/gungunGuptaProfilePic.jpg",
+      "expertise": [
+        "SAP BTP",
+        "Machine Learning"
+        
+      ],
+      "socials": {
+        "github": "https://github.com/Gungungupta7525",
+        "linkedin": "https://www.linkedin.com/in/gungun-gupta-14325522b/",
+        "website": "https://..."
+      }
     }
   ]
 }
