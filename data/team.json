@@ -5,7 +5,7 @@
       "name": "Shubham Kaushik",
       "role": "Founder & AI Researcher",
       "bio": "Working on Agentic AI, Large Language Models, Computer Vision and Enterprise AI Systems.",
-      "photo": "images/shubhamKaushikProfilePic.jpg",
+      "photo": "./images/shubhamKaushikProfilePic.jpg",
       "expertise": [
         "Generative AI",
         "Agentic AI",
@@ -13,26 +13,88 @@
         "Knowledge Graphs"
       ],
       "socials": {
-        "github": "https://github.com/...",
-        "linkedin": "https://linkedin.com/in/...",
-        "website": "https://..."
+        "github": "https://github.com/Eskaykaushik",
+        "linkedin": "https://www.linkedin.com/in/eskaykaushik/",
+        "email":"eskaykaushik14@gmail.com"
+        
       }
     },
     {
-      "id": "jane-doe",
-      "name": "Jane Doe",
-      "role": "Research Intern",
-      "bio": "Interested in multimodal AI and reinforcement learning.",
-      "photo": "images/team/jane-doe.jpg",
+      "id": "gungun-gupta",
+      "name": "Gungun Gupta",
+      "role": "Founder & Software Engineer",
+      "bio": "Working on SAP BTP(Business Technology Platform)",
+      "photo": "./images/gungunGuptaProfilePic.jpeg",
       "expertise": [
-        "Python",
-        "Deep Learning",
-        "PyTorch"
+        "SAP BTP",
+        "Machine Learning"
       ],
       "socials": {
-        "github": "",
-        "linkedin": ""
+        "github": "https://github.com/Gungungupta7525",
+        "linkedin": "https://www.linkedin.com/in/gungun-gupta-14325522b/",
+        "email":"gungungupta526@gmail.com"
+        
+      }
+    },
+    {
+      "id": "anmol-titoriya",
+      "name": "Anmol Titoriya",
+      "role": "Senior Software Engineer",
+      "bio": "Interested in multimodal AI and reinforcement learning.",
+      "photo": "./images/anmol-titoriya.jpg",
+      "expertise": [
+        "ASP.NET",
+        "C#",
+        "SQL",
+        "Azure",
+        "AWS"
+      ],
+      "socials": {
+        "github": "https://github.com/AnmolTitoriya",
+        "linkedin": " https://www.linkedin.com/in/anmol-t-258828a9/",
+        "email": "anmol.titoriya0147@gmail.com"
+      }
+    },
+    
+    {
+      "id": "Utsav-Anand",
+      "name": "Utsav Anand",
+      "role": "Buisness Development Head",
+      "bio": "Experienced in Tech consulting",
+      "photo": "images\\utsav.png",
+      "expertise": [
+        "Microsoft Power Platform",
+        "SharePoint Online",
+        "Microsoft 365",
+        "Web Development"
+      ],
+      "socials": {
+        
+        "linkedin": "https://www.linkedin.com/in/anandutsav/",
+        "email":"utsavanand2908@gmail.com"
+        
+      }
+    },
+    {
+      "id": "Aditya-Dubey",
+      "name": "Aditya Dubey",
+      "role": "AI Engineer",
+      "bio": "Experienced in Tech consulting",
+      "photo": "images\\aditya.png",
+      "expertise": [
+        "Microsoft Power Platform",
+        "SharePoint Online",
+        "Microsoft 365",
+        "Web Development"
+      ],
+      "socials": {
+        
+        "linkedin": "https://www.linkedin.com/in/aditya-dubey-4092b1214",
+        "github": "https://github.com/Gungungupta7525",
+        "email":"aditya.dubey0147@gmail.com"
+        
       }
     }
+    
   ]
 }

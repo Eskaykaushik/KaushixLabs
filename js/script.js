@@ -22,6 +22,8 @@ let index = 0;
 
 function typeCommand(){
 
+    if(!commandElement) return;
+
     if(index < command.length){
 
         commandElement.textContent += command.charAt(index);
@@ -41,6 +43,8 @@ function typeCommand(){
 }
 
 function printLines(){
+
+    if(!output) return;
 
     let i = 0;
 
@@ -81,18 +85,21 @@ function setTheme(theme) {
     localStorage.setItem("theme", theme);
 
     // Update button icon
-    themeToggle.textContent = theme === "dark" ? "☀" : "☾";
+    if(themeToggle) {
+        themeToggle.textContent = theme === "dark" ? "☀" : "☾";
+    }
 
 }
 
 const savedTheme = localStorage.getItem("theme") || "dark";
-
 setTheme(savedTheme);
 
-themeToggle.addEventListener("click", () => {
+if(themeToggle) {
+    themeToggle.addEventListener("click", () => {
 
-    const currentTheme = document.documentElement.getAttribute("data-theme");
+        const currentTheme = document.documentElement.getAttribute("data-theme");
 
-    setTheme(currentTheme === "dark" ? "light" : "dark");
+        setTheme(currentTheme === "dark" ? "light" : "dark");
 
-});
+    });
+}
