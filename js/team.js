@@ -63,10 +63,10 @@ async function loadTeam() {
                     </div>
 
 
-                    <p>
-                        ${member.bio}
-                    </p>
-
+                    <div class="bio-block">
+                        <p class="bio-label">About</p>
+                        <p class="bio-text">${member.bio}</p>
+                    </div>
 
                     <div class="tags">
                         ${expertise}
