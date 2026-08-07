@@ -46,6 +46,8 @@ async function loadTeam() {
                             src="${member.photo}"
                             alt="${member.name}"
                             class="team-photo"
+                            style="width: 100px; height: 100px; min-width: 100px; min-height: 100px; object-fit: cover; border-radius: 12px; border: 2px solid var(--border);"
+                            onerror="this.src='https://via.placeholder.com/100?text=${member.name.replace(/\s+/g, '+')}';"
                         >
 
                         <div>
@@ -75,8 +77,8 @@ async function loadTeam() {
 
                         ${
                             member.socials.github
-                            ? `<a href="${member.socials.github}" target="_blank">
-                                GitHub
+                            ? `<a href="${member.socials.github}" target="_blank" title="GitHub">
+                                <i class="fab fa-github"></i>
                                </a>`
                             : ""
                         }
@@ -84,8 +86,16 @@ async function loadTeam() {
 
                         ${
                             member.socials.linkedin
-                            ? `<a href="${member.socials.linkedin}" target="_blank">
-                                LinkedIn
+                            ? `<a href="${member.socials.linkedin}" target="_blank" title="LinkedIn">
+                                <i class="fab fa-linkedin-in"></i>
+                               </a>`
+                            : ""
+                        }
+
+                        ${
+                            member.socials.email
+                            ? `<a href="mailto:${member.socials.email}" title="Email">
+                                <i class="fas fa-envelope"></i>
                                </a>`
                             : ""
                         }
