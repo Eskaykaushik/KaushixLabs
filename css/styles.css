@@ -1270,3 +1270,109 @@ justify-content:center;
         font-size: 0.9rem;
     }
 }
+
+/* ===========================
+   CLIENT SECTION
+=========================== */
+
+.client-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin: 4rem 0 6rem;
+}
+
+.client-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease), border-color 0.3s var(--ease);
+    will-change: transform;
+    display: flex;
+    flex-direction: column;
+}
+
+.client-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--green);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.client-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.client-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.client-avatar {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(63, 185, 80, 0.08);
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: transform 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+
+.client-card:hover .client-avatar {
+    border-color: var(--green);
+    transform: scale(1.08);
+}
+
+.client-header h3 {
+    font-size: 1.15rem;
+    margin: 0;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.client-industry {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: "JetBrains Mono", monospace;
+    margin-top: 0.25rem;
+}
+
+.client-content > p {
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: 0.93rem;
+    margin-bottom: 1.5rem;
+}
+
+.client-footer {
+    margin-top: auto;
+}
+
+.client-service {
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--green);
+    border-radius: 999px;
+    color: var(--green);
+    font-size: 0.72rem;
+    font-family: "JetBrains Mono", monospace;
+}
+
+@media(max-width:768px) {
+    .client-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}

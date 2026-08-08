@@ -1,0 +1,18 @@
+{
+  "clients": [
+    {
+      "id": "jobingen",
+      "name": "JobInGen",
+      "industry": "HR Tech",
+      "service": "AI Research",
+      "description": "Partnering on AI-powered recruitment, candidate matching, and hiring workflow automation."
+    },
+    {
+      "id": "trippyway",
+      "name": "TrippyWay",
+      "industry": "Travel",
+      "service": "Consultancy",
+      "description": "Collaborating on intelligent travel planning, personalized recommendations, and booking experience."
+    }
+  ]
+}
