@@ -61,7 +61,7 @@
       "name": "Utsav Anand",
       "role": "Buisness Development Head",
       "bio": "Experienced in Tech Consulting",
-      "photo": "images\\utsav.png",
+      "photo": "./images/utsav.png",
       "expertise": [
         "Microsoft Power Platform",
         "SharePoint Online",
@@ -80,7 +80,7 @@
       "name": "Aditya Dubey",
       "role": "AI Engineer",
       "bio": "Experienced in Tech Consulting",
-      "photo": "images\\aditya.png",
+      "photo": "./images/aditya.png",
       "expertise": [
         "Microsoft Power Platform",
         "SharePoint Online",
@@ -99,7 +99,7 @@
       "name": "Pushpak Shukla",
       "role": "Research Head",
       "bio": "Working on Reinforcement Learning, UAV Networks, and Intelligent Edge Computing.",
-      "photo": "images\\pushpak.png",
+      "photo": "./images/pushpak.png",
       "expertise": [
         "Microsoft Power Platform",
         "SharePoint Online",
