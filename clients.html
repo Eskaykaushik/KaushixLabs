@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Research | Kaushix Labs</title>
+    <title>Clients | Kaushix Labs</title>
 
-    <meta name="description" content="AI research projects at Kaushix Labs: enterprise automation, intelligent agents, computer vision, and generative AI.">
+    <meta name="description"
+        content="Organizations that partner with Kaushix Labs for AI research, industry training and consultancy.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +16,16 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <script>
+        document.documentElement.setAttribute(
+            "data-theme",
+            localStorage.getItem("theme") || "dark"
+        );
+    </script>
+
 </head>
 
 <body>
@@ -28,15 +39,16 @@
             </a>
 
             <nav>
-              
-<a href="research.html"  class="active">Research</a>
+
+<a href="research.html">Research</a>
 <a href="team.html">Our Team</a>
-<a href="clients.html">Clients</a>
+<a href="clients.html" class="active">Clients</a>
 
 <a href="contact.html">Contact</a>
- <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                     ☾
                 </button>
+
             </nav>
 
         </div>
@@ -49,23 +61,22 @@
 
             <section class="page-hero">
 
-                <p class="terminal-path">$ cd research/</p>
+                <p class="terminal-path">$ cd clients/</p>
 
-                <h1>Research Projects</h1>
+                <h1>Our Clients</h1>
 
                 <p class="page-description">
-                    We develop practical AI systems that solve real-world problems across
-                    enterprise automation, intelligent agents, computer vision,
-                    knowledge representation, and generative AI.
+                    Organizations we've partnered with on AI research,
+                    industry training, and enterprise consultancy.
                 </p>
 
             </section>
 
-            <!-- Projects are rendered dynamically from data/projects.json -->
-            <section id="research-grid" class="research-grid">
+            <!-- Clients are rendered dynamically from data/clients.json -->
+            <section id="clients-grid" class="client-grid">
 
-                <div class="research-loading">
-                    <p>$ loading research projects...</p>
+                <div class="loading">
+                    <p>$ loading clients...</p>
                 </div>
 
             </section>
@@ -75,7 +86,7 @@
     </main>
 
     <script src="js/script.js"></script>
-    <script src="js/research.js"></script>
+    <script src="js/clients.js"></script>
 
 </body>
 
