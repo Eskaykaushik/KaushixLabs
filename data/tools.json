@@ -23,6 +23,15 @@
             "icon": "fa-solid fa-square-root-variable",
             "description": "Mean, median, mode, variance and std dev for any dataset — paste numbers or upload a CSV, with live histograms and trend plots.",
             "path": "pages/tools/statistics.html"
+        },
+        {
+            "id": "docnest",
+            "title": "DocNest",
+            "tag": "Learning",
+            "icon": "fa-solid fa-book",
+            "description": "A lightweight, dependency-free docs and tutorial engine for AI enthusiasts — searchable learning paths, sidebars and reading progress.",
+            "url": "https://docnest.eskaykaushik14.workers.dev/",
+            "external": true
         }
     ]
 }

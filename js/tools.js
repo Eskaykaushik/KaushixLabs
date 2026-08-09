@@ -35,6 +35,10 @@ async function loadTools() {
             container.appendChild(createToolCard(tool));
         });
 
+        container.querySelectorAll(".tool-card[data-external]").forEach(card => {
+            card.target = "_blank";
+        });
+
     } catch (error) {
         console.error("Failed to load tools:", error);
 
@@ -48,16 +52,22 @@ async function loadTools() {
 
 function createToolCard(tool) {
 
+    const external = tool.external === true;
+
     const card = document.createElement("a");
     card.className = "research-card tool-card";
-    card.href = escapeHtml(tool.path);
+    card.href = escapeHtml(external ? tool.url : tool.path);
     card.rel = "noopener";
+
+    if (external) {
+        card.dataset.external = "true";
+    }
 
     card.innerHTML = `
         <div class="terminal-bar">
             <span class="dot green"></span>
             <span class="terminal-title">
-                tools://${escapeHtml(tool.id)}
+                ${escapeHtml(external ? "web://" + tool.id : "tools://" + tool.id)}
             </span>
         </div>
 
@@ -75,7 +85,7 @@ function createToolCard(tool) {
 
             <p>${escapeHtml(tool.description)}</p>
 
-            <span class="card-link">$ run tool</span>
+            <span class="card-link">${escapeHtml(external ? "$ open site" : "$ run tool")}</span>
 
         </div>
     `;
