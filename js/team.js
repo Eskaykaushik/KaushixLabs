@@ -1,5 +1,14 @@
 document.addEventListener("DOMContentLoaded", loadTeam);
 
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
 async function loadTeam() {
 
     const container = document.getElementById("team-grid");
@@ -10,6 +19,10 @@ async function loadTeam() {
 
         const response = await fetch("data/team.json");
 
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
         const data = await response.json();
 
         container.innerHTML = "";
@@ -17,8 +30,10 @@ async function loadTeam() {
         data.members.forEach(member => {
 
             const expertise = member.expertise
-                .map(skill => `<span>${skill}</span>`)
+                .map(skill => `<span>${escapeHtml(skill)}</span>`)
                 .join("");
+
+            const fallbackText = encodeURIComponent(member.name);
 
             const card = document.createElement("div");
 
@@ -31,7 +46,7 @@ async function loadTeam() {
                     <span class="dot green"></span>
 
                     <span class="terminal-title">
-                        team://${member.id}
+                        team://${escapeHtml(member.id)}
                     </span>
 
                 </div>
@@ -43,19 +58,18 @@ async function loadTeam() {
                     <div class="team-header">
 
                         <img
-                            src="${member.photo}"
-                            alt="${member.name}"
+                            src="${escapeHtml(member.photo)}"
+                            alt="${escapeHtml(member.name)}"
                             class="team-photo"
-                            style="width: 100px; height: 100px; min-width: 100px; min-height: 100px; object-fit: cover; border-radius: 12px; border: 2px solid var(--border);"
-                            onerror="this.src='https://via.placeholder.com/100?text=${member.name.replace(/\s+/g, '+')}';"
+                            onerror="this.src='https://via.placeholder.com/100?text=${fallbackText}';"
                         >
 
                         <div>
 
-                            <h3>${member.name}</h3>
+                            <h3>${escapeHtml(member.name)}</h3>
 
                             <span class="status active">
-                                ${member.role}
+                                ${escapeHtml(member.role)}
                             </span>
 
                         </div>
@@ -63,10 +77,10 @@ async function loadTeam() {
                     </div>
 
 
-                    <p>
-                        ${member.bio}
-                    </p>
-
+                    <div class="bio-block">
+                        <p class="bio-label">About</p>
+                        <p class="bio-text">${escapeHtml(member.bio)}</p>
+                    </div>
 
                     <div class="tags">
                         ${expertise}
@@ -77,7 +91,7 @@ async function loadTeam() {
 
                         ${
                             member.socials.github
-                            ? `<a href="${member.socials.github}" target="_blank" title="GitHub">
+                            ? `<a href="${escapeHtml(member.socials.github)}" target="_blank" rel="noopener" title="GitHub">
                                 <i class="fab fa-github"></i>
                                </a>`
                             : ""
@@ -86,7 +100,7 @@ async function loadTeam() {
 
                         ${
                             member.socials.linkedin
-                            ? `<a href="${member.socials.linkedin}" target="_blank" title="LinkedIn">
+                            ? `<a href="${escapeHtml(member.socials.linkedin)}" target="_blank" rel="noopener" title="LinkedIn">
                                 <i class="fab fa-linkedin-in"></i>
                                </a>`
                             : ""
@@ -94,7 +108,7 @@ async function loadTeam() {
 
                         ${
                             member.socials.email
-                            ? `<a href="mailto:${member.socials.email}" title="Email">
+                            ? `<a href="mailto:${escapeHtml(member.socials.email)}" title="Email">
                                 <i class="fas fa-envelope"></i>
                                </a>`
                             : ""

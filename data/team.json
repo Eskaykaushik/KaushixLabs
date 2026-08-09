@@ -4,7 +4,7 @@
       "id": "shubham-kaushik",
       "name": "Shubham Kaushik",
       "role": "Founder & AI Researcher",
-      "bio": "Working on Agentic AI, Large Language Models, Computer Vision and Enterprise AI Systems.",
+      "bio": "Working on Agentic AI, Large Language Models, Computer Vision and Enterprise AI Systems",
       "photo": "./images/shubhamKaushikProfilePic.jpg",
       "expertise": [
         "Generative AI",
@@ -23,7 +23,7 @@
       "id": "gungun-gupta",
       "name": "Gungun Gupta",
       "role": "Founder & Software Engineer",
-      "bio": "Working on SAP BTP(Business Technology Platform)",
+      "bio": "Working on SAP Business Technology Platform , SAP Business Application Studio and SAP S/4HANA Cloud",
       "photo": "./images/gungunGuptaProfilePic.jpeg",
       "expertise": [
         "SAP BTP",
@@ -40,7 +40,7 @@
       "id": "anmol-titoriya",
       "name": "Anmol Titoriya",
       "role": "Senior Software Engineer",
-      "bio": "Interested in multimodal AI and reinforcement learning.",
+      "bio": "Interested in Multimodal AI and Reinforcement Learning",
       "photo": "./images/anmol-titoriya.jpg",
       "expertise": [
         "ASP.NET",
@@ -51,17 +51,17 @@
       ],
       "socials": {
         "github": "https://github.com/AnmolTitoriya",
-        "linkedin": " https://www.linkedin.com/in/anmol-t-258828a9/",
+        "linkedin": "https://www.linkedin.com/in/anmol-t-258828a9/",
         "email": "anmol.titoriya0147@gmail.com"
       }
     },
     
     {
-      "id": "Utsav-Anand",
+      "id": "utsav-anand",
       "name": "Utsav Anand",
       "role": "Buisness Development Head",
-      "bio": "Experienced in Tech consulting",
-      "photo": "images\\utsav.png",
+      "bio": "Experienced in Tech Consulting",
+      "photo": "./images/utsav.png",
       "expertise": [
         "Microsoft Power Platform",
         "SharePoint Online",
@@ -76,11 +76,11 @@
       }
     },
     {
-      "id": "Aditya-Dubey",
+      "id": "aditya-dubey",
       "name": "Aditya Dubey",
       "role": "AI Engineer",
-      "bio": "Experienced in Tech consulting",
-      "photo": "images\\aditya.png",
+      "bio": "Experienced in Tech Consulting",
+      "photo": "./images/aditya.png",
       "expertise": [
         "Microsoft Power Platform",
         "SharePoint Online",
@@ -89,9 +89,28 @@
       ],
       "socials": {
         
-        "linkedin": "https://www.linkedin.com/in/aditya-dubey-4092b1214",
-        "github": "https://github.com/Gungungupta7525",
-        "email":"aditya.dubey0147@gmail.com"
+        "linkedin": "https://www.linkedin.com/in/aditya-dubey-4092b1214"
+        
+        
+      }
+    },
+     {
+      "id": "pushpak-shukla",
+      "name": "Pushpak Shukla",
+      "role": "Research Head",
+      "bio": "Working on Reinforcement Learning, UAV Networks, and Intelligent Edge Computing.",
+      "photo": "./images/pushpak.png",
+      "expertise": [
+        "Microsoft Power Platform",
+        "SharePoint Online",
+        "Microsoft 365",
+        "Web Development"
+      ],
+      "socials": {
+        
+        "linkedin": "https://www.linkedin.com/in/pushpakshukla/"
+        
+        
         
       }
     }

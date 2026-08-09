@@ -6,6 +6,15 @@ document.addEventListener("DOMContentLoaded", () => {
     loadResearchProjects();
 });
 
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
 async function loadResearchProjects() {
     const container = document.getElementById("research-grid");
 
@@ -39,12 +48,32 @@ async function loadResearchProjects() {
 
 function createProjectCard(project) {
 
-    const card = document.createElement("a");
+    const links = project.links || {};
+
+    const external = [
+        ["github", "GitHub"],
+        ["paper", "Paper"],
+        ["demo", "Demo"]
+    ]
+        .filter(([key]) => links[key])
+        .map(([key, label]) => `
+            <a class="project-link" href="${escapeHtml(links[key])}"
+               target="_blank" rel="noopener">${label}</a>
+        `)
+        .join("");
+
+    const firstLink = links.page || links.github || links.paper || links.demo;
+
+    const card = document.createElement(firstLink ? "a" : "div");
     card.className = "research-card";
-    card.href = project.links?.page || "#";
+    if (firstLink) {
+        card.href = escapeHtml(firstLink);
+        card.target = "_blank";
+        card.rel = "noopener";
+    }
 
     const tags = (project.technologies || [])
-        .map(tag => `<span>${tag}</span>`)
+        .map(tag => `<span>${escapeHtml(tag)}</span>`)
         .join("");
 
     const status = (project.status || "Research").toUpperCase();
@@ -54,7 +83,7 @@ function createProjectCard(project) {
         <div class="terminal-bar">
             <span class="dot green"></span>
             <span class="terminal-title">
-                research://${project.id}
+                research://${escapeHtml(project.id)}
             </span>
         </div>
 
@@ -64,15 +93,17 @@ function createProjectCard(project) {
                 ${status}
             </span>
 
-            <h3>${project.title}</h3>
+            <h3>${escapeHtml(project.title)}</h3>
 
-            <p>${project.description}</p>
+            <p>${escapeHtml(project.description)}</p>
 
             <div class="tags">
                 ${tags}
             </div>
 
-            <span class="card-link">$ open project</span>
+            ${external ? `<div class="project-links">${external}</div>` : ""}
+
+            ${firstLink ? '<span class="card-link">$ open project</span>' : ""}
 
         </div>
     `;
