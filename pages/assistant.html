@@ -11,7 +11,7 @@
     <title>Kaushix AI | Kaushix Labs</title>
 
     <meta name="description"
-        content="Kaushix AI — a terminal-based assistant. Type at the prompt and press Enter.">
+        content="Kaushix AI — a terminal-style chat assistant. Ask anything and get an answer.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -22,6 +22,8 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="../css/styles.css">
+
+    <link rel="stylesheet" href="../css/chat.css">
 
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -77,10 +79,10 @@
 
 
     <!-- ==========================================
-         AI Page
+         AI Chat Page
     =========================================== -->
 
-    <main class="container terminal-page">
+    <main class="container chat-page">
 
 
         <!-- Page Header -->
@@ -96,20 +98,20 @@
             </h1>
 
             <p>
-                A shared AI gateway. Type at the prompt,
-                press Enter, and the model answers right here in the terminal.
+                A shared AI gateway. Ask a question, press Enter,
+                and the model answers right here in the terminal.
             </p>
 
         </section>
 
 
-        <!-- Terminal -->
+        <!-- Chat -->
 
-        <section class="terminal-shell">
+        <section class="chat-shell">
 
             <!-- Title bar -->
 
-            <div class="terminal-titlebar">
+            <div class="chat-titlebar">
 
                 <div class="terminal-dots">
 
@@ -121,58 +123,55 @@
 
                 </div>
 
-                <span class="terminal-title">
-                    kaushix-ai — bash — 80×24
+                <span class="chat-title">
+                    kaushix-ai — chat
                 </span>
 
-                <span class="ai-status">
+                <div class="chat-tools">
 
-                    <span class="status-dot"></span>
+                    <span class="ai-status">
 
-                    API ONLINE
+                        <span class="status-dot"></span>
 
-                </span>
+                        API ONLINE
 
-            </div>
+                    </span>
 
+                    <div class="ai-model">
 
-            <!-- Toolbar -->
+                        <label for="model">model</label>
 
-            <div class="terminal-toolbar">
+                        <select id="model">
 
-                <div class="ai-model">
+                            <option value="assistant">
+                                k-core
+                            </option>
 
-                    <label for="model">model</label>
+                            <option value="fast">
+                                k-spark
+                            </option>
 
-                    <select id="model">
+                            <option value="reason">
+                                k-mind
+                            </option>
 
-                        <option value="assistant">
-                            gpt-oss-20b · assistant
-                        </option>
+                            <option value="research">
+                                k-atlas
+                            </option>
 
-                        <option value="fast">
-                            gpt-oss-20b · fast
-                        </option>
+                            <option value="compound">
+                                k-nexus
+                            </option>
 
-                        <option value="reason">
-                            gpt-oss-120b · reason
-                        </option>
+                        </select>
 
-                        <option value="research">
-                            compound-mini · research
-                        </option>
+                    </div>
 
-                        <option value="compound">
-                            compound · compound
-                        </option>
-
-                    </select>
+                    <button id="new-chat" class="chat-new" type="button" title="New chat">
+                        ↺
+                    </button>
 
                 </div>
-
-                <button id="clear" type="button">
-                    clear
-                </button>
 
             </div>
 
@@ -180,8 +179,8 @@
             <!-- Output -->
 
             <div
-                id="terminal-output"
-                class="terminal-output"
+                id="chat-output"
+                class="chat-output"
                 aria-live="polite"
                 tabindex="0"
             ></div>
@@ -189,7 +188,7 @@
 
             <!-- Input -->
 
-            <div class="terminal-input-line">
+            <div class="chat-input-line">
 
                 <span class="terminal-prompt">
                     kaushix@labs:~$
@@ -198,16 +197,17 @@
                 <textarea
                     id="prompt"
                     rows="1"
-                    placeholder="type a message… Enter to send, Shift+Enter for a newline"
+                    placeholder="type a message… Enter to send"
                     aria-label="Message to Kaushix AI"
                 ></textarea>
 
                 <button
                     id="send"
-                    class="terminal-send"
+                    class="chat-send"
                     type="button"
+                    aria-label="Send message"
                 >
-                    ⏎
+                    <i class="fas fa-arrow-up"></i>
                 </button>
 
             </div>
@@ -307,6 +307,8 @@
     </script>
 
     <!-- Page JS -->
+
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
 
     <script src="../js/assistant.js"></script>
 

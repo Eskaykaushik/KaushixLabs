@@ -1,5 +1,5 @@
 /* ==========================================
-   Kaushix AI — terminal assistant
+   Kaushix AI — Claude-style terminal chat
 ========================================== */
 
 const API_URL =
@@ -15,108 +15,219 @@ const ENDPOINTS = {
 
 const PROMPT = "kaushix@labs:~$";
 
+const SUGGESTIONS = [
+    "Explain how a transformer model works in simple terms",
+    "Write a Python script to fetch data from an API",
+    "Summarize the key ideas of machine learning in one paragraph",
+    "Give me 5 ideas for AI startup projects"
+];
+
 
 /* ==========================================
    DOM Elements
 ========================================== */
 
-const terminalOutput = document.getElementById("terminal-output");
+const chatOutput = document.getElementById("chat-output");
 const promptInput = document.getElementById("prompt");
 const modelSelect = document.getElementById("model");
 const sendButton = document.getElementById("send");
-const clearButton = document.getElementById("clear");
+const newChatButton = document.getElementById("new-chat");
 
 
 /* ==========================================
-   Terminal primitives
+   Primitives
 ========================================== */
+
+let userNearBottom = true;
+
+
+function isNearBottom() {
+
+    return (
+        chatOutput.scrollHeight - chatOutput.scrollTop - chatOutput.clientHeight
+    ) < 120;
+
+}
+
 
 function scrollToBottom() {
 
-    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    chatOutput.scrollTop = chatOutput.scrollHeight;
 
 }
 
 
-function addLine() {
+function el(tag, className) {
 
-    const line = document.createElement("div");
+    const node = document.createElement(tag);
 
-    line.className = "term-line";
+    if (className) {
+        node.className = className;
+    }
 
-    terminalOutput.appendChild(line);
+    return node;
+
+}
+
+
+function makeAvatar() {
+
+    const avatar = el("div", "msg-avatar");
+
+    avatar.innerHTML = '<i class="fas fa-terminal"></i>';
+
+    return avatar;
+
+}
+
+
+/* ==========================================
+   Welcome screen
+========================================== */
+
+function renderWelcome() {
+
+    chatOutput.innerHTML = "";
+
+    const welcome = el("div", "welcome");
+
+    const icon = el("div", "welcome-icon");
+
+    icon.innerHTML = '<i class="fas fa-terminal"></i>';
+
+    const title = el("h2", null);
+
+    title.textContent = "How can I help you today?";
+
+    const sub = el("p", null);
+
+    sub.textContent = "Ask anything — code, research, or plain questions. Pick a model and hit Enter.";
+
+    const chips = el("div", "chips");
+
+    SUGGESTIONS.forEach((suggestion) => {
+
+        const chip = el("button", "chip");
+
+        chip.type = "button";
+
+        chip.textContent = suggestion;
+
+        chip.addEventListener("click", () => {
+            sendMessage(suggestion);
+        });
+
+        chips.appendChild(chip);
+
+    });
+
+    welcome.appendChild(icon);
+    welcome.appendChild(title);
+    welcome.appendChild(sub);
+    welcome.appendChild(chips);
+
+    chatOutput.appendChild(welcome);
+
+    promptInput.focus();
+
+}
+
+
+/* ==========================================
+   Messages
+========================================== */
+
+function addUserMessage(text) {
+
+    const msg = el("div", "msg msg-user");
+
+    const bubble = el("div", "msg-bubble");
+
+    bubble.textContent = text;
+
+    msg.appendChild(bubble);
+
+    chatOutput.appendChild(msg);
 
     scrollToBottom();
 
-    return line;
+}
+
+
+function addAssistantMessage(modelLabel) {
+
+    const msg = el("div", "msg msg-ai");
+
+    const body = el("div", "msg-body");
+
+    const name = el("div", "msg-name");
+
+    name.textContent = "kaushix-ai · " + modelLabel;
+
+    const text = el("div", "msg-text");
+
+    body.appendChild(name);
+    body.appendChild(text);
+
+    msg.appendChild(makeAvatar());
+    msg.appendChild(body);
+
+    chatOutput.appendChild(msg);
+
+    scrollToBottom();
+
+    return text;
 
 }
 
 
-function printSystem(text) {
+function addTypingIndicator() {
 
-    const line = addLine();
+    const msg = el("div", "msg msg-ai");
 
-    line.className = "term-line term-system";
+    const body = el("div", "msg-body");
 
-    line.textContent = text;
+    const dots = el("div", "typing-dots");
 
-    return line;
+    dots.innerHTML = "<span></span><span></span><span></span>";
 
-}
+    body.appendChild(dots);
 
+    msg.appendChild(makeAvatar());
+    msg.appendChild(body);
 
-function printError(text) {
+    chatOutput.appendChild(msg);
 
-    const line = addLine();
+    scrollToBottom();
 
-    line.className = "term-line term-error";
-
-    line.textContent = text;
-
-}
-
-
-function printUser(message) {
-
-    const line = addLine();
-
-    line.className = "term-line term-user";
-
-    const promptSpan = document.createElement("span");
-
-    promptSpan.className = "terminal-prompt";
-
-    promptSpan.textContent = PROMPT + " ";
-
-    const commandSpan = document.createElement("span");
-
-    commandSpan.className = "term-cmd";
-
-    commandSpan.textContent = message;
-
-    line.appendChild(promptSpan);
-
-    line.appendChild(commandSpan);
+    return msg;
 
 }
 
 
-function printAI(modelLabel) {
+function addError(message) {
 
-    const line = addLine();
+    const msg = el("div", "msg msg-ai");
 
-    line.className = "term-line term-ai";
+    const body = el("div", "msg-body");
 
-    const labelSpan = document.createElement("span");
+    const name = el("div", "msg-name");
 
-    labelSpan.className = "term-ai-label";
+    name.textContent = "kaushix-ai · error";
 
-    labelSpan.textContent = "⟶ " + modelLabel + ": ";
+    const text = el("div", "msg-text msg-error");
 
-    line.appendChild(labelSpan);
+    text.textContent = message;
 
-    return line;
+    body.appendChild(name);
+    body.appendChild(text);
+
+    msg.appendChild(makeAvatar());
+    msg.appendChild(body);
+
+    chatOutput.appendChild(msg);
+
+    scrollToBottom();
 
 }
 
@@ -125,30 +236,47 @@ function typeText(text, container) {
 
     return new Promise((resolve) => {
 
-        const cursor = document.createElement("span");
-
-        cursor.className = "block-cursor";
-
-        container.appendChild(cursor);
+        const cursor = el("span", "block-cursor");
 
         let i = 0;
+
+        let buffer = "";
+
+        const render = () => {
+
+            container.innerHTML = marked.parse(buffer);
+
+            container.appendChild(cursor);
+
+        };
+
+        render();
 
         const step = () => {
 
             if (i < text.length) {
 
-                container.insertBefore(
-                    document.createTextNode(text[i]),
-                    cursor
-                );
+                buffer += text[i];
 
                 i++;
 
-                scrollToBottom();
+                render();
+
+                if (userNearBottom) {
+
+                    scrollToBottom();
+
+                }
 
                 setTimeout(step, 8);
 
             } else {
+
+                if (userNearBottom) {
+
+                    scrollToBottom();
+
+                }
 
                 resolve();
 
@@ -159,52 +287,6 @@ function typeText(text, container) {
         step();
 
     });
-
-}
-
-
-/* ==========================================
-   Boot / commands
-========================================== */
-
-function bootBanner() {
-
-    printSystem("Kaushix AI v0.2.0 — shared gateway ready");
-    printSystem("type 'help' for commands · pick a model in the toolbar · Enter to send");
-    printSystem("");
-
-}
-
-
-function printHelp() {
-
-    printSystem("usage: kaushix-ai [message]");
-    printSystem("  <message>             send to the selected model");
-    printSystem("  clear                 clear this terminal");
-    printSystem("  help                  show this help");
-    printSystem("  models                list available models");
-    printSystem("");
-
-}
-
-
-function printModels() {
-
-    printSystem("  assistant    gpt-oss-20b     general assistant");
-    printSystem("  fast         gpt-oss-20b     quick, low-latency");
-    printSystem("  reason       gpt-oss-120b    deep reasoning");
-    printSystem("  research     compound-mini   research oriented");
-    printSystem("  compound     compound        compound analysis");
-    printSystem("");
-
-}
-
-
-function clearTerminal() {
-
-    terminalOutput.innerHTML = "";
-
-    promptInput.focus();
 
 }
 
@@ -222,7 +304,7 @@ async function askAssistant(message, model) {
     }
 
     const response = await fetch(
-        API_URL + endpoint,
+        API_URL.replace(/\/+$/, "") + endpoint,
         {
             method: "POST",
 
@@ -259,64 +341,45 @@ function modelLabel() {
 }
 
 
-async function sendMessage() {
+async function sendMessage(preset) {
 
-    const message = promptInput.value.trim();
+    const message = (
+        typeof preset === "string" ? preset : promptInput.value
+    ).trim();
 
-    if (!message) {
+    if (!message || sendButton.disabled) {
         return;
     }
 
     promptInput.value = "";
     resizeInput();
 
-    printUser(message);
-
-    const firstWord = message.split(/\s+/)[0].toLowerCase();
-
-    if (firstWord === "clear") {
-        clearTerminal();
-        return;
-    }
-
-    if (firstWord === "help") {
-        printHelp();
-        promptInput.focus();
-        return;
-    }
-
-    if (firstWord === "models") {
-        printModels();
-        promptInput.focus();
-        return;
-    }
+    addUserMessage(message);
 
     const model = modelSelect.value;
     const label = modelLabel();
 
     sendButton.disabled = true;
 
-    const statusLine = printSystem("⟶ querying " + label + " …");
+    const typing = addTypingIndicator();
 
     try {
 
         const answer = await askAssistant(message, model);
 
-        statusLine.remove();
+        typing.remove();
 
-        const aiLine = printAI(label);
+        const textEl = addAssistantMessage(label);
 
-        await typeText(answer, aiLine);
+        await typeText(answer, textEl);
 
     } catch (error) {
 
         console.error("Assistant error:", error);
 
-        statusLine.remove();
+        typing.remove();
 
-        printError("! " + error.message);
-
-        printSystem("  check that the API key is configured on the server");
+        addError("! " + error.message);
 
     } finally {
 
@@ -350,17 +413,17 @@ if (sendButton) {
 
     sendButton.addEventListener(
         "click",
-        sendMessage
+        () => sendMessage()
     );
 
 }
 
 
-if (clearButton) {
+if (newChatButton) {
 
-    clearButton.addEventListener(
+    newChatButton.addEventListener(
         "click",
-        clearTerminal
+        renderWelcome
     );
 
 }
@@ -394,11 +457,18 @@ if (promptInput) {
 }
 
 
-if (terminalOutput) {
+if (chatOutput) {
 
-    terminalOutput.addEventListener(
+    chatOutput.addEventListener(
         "click",
         () => promptInput.focus()
+    );
+
+    chatOutput.addEventListener(
+        "scroll",
+        () => {
+            userNearBottom = isNearBottom();
+        }
     );
 
 }
@@ -408,6 +478,6 @@ if (terminalOutput) {
    Init
 ========================================== */
 
-bootBanner();
+renderWelcome();
 
 promptInput.focus();
