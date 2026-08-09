@@ -38,6 +38,18 @@ const newChatButton = document.getElementById("new-chat");
    Primitives
 ========================================== */
 
+let userNearBottom = true;
+
+
+function isNearBottom() {
+
+    return (
+        chatOutput.scrollHeight - chatOutput.scrollTop - chatOutput.clientHeight
+    ) < 120;
+
+}
+
+
 function scrollToBottom() {
 
     chatOutput.scrollTop = chatOutput.scrollHeight;
@@ -226,26 +238,45 @@ function typeText(text, container) {
 
         const cursor = el("span", "block-cursor");
 
-        container.appendChild(cursor);
-
         let i = 0;
+
+        let buffer = "";
+
+        const render = () => {
+
+            container.innerHTML = marked.parse(buffer);
+
+            container.appendChild(cursor);
+
+        };
+
+        render();
 
         const step = () => {
 
             if (i < text.length) {
 
-                container.insertBefore(
-                    document.createTextNode(text[i]),
-                    cursor
-                );
+                buffer += text[i];
 
                 i++;
 
-                scrollToBottom();
+                render();
+
+                if (userNearBottom) {
+
+                    scrollToBottom();
+
+                }
 
                 setTimeout(step, 8);
 
             } else {
+
+                if (userNearBottom) {
+
+                    scrollToBottom();
+
+                }
 
                 resolve();
 
@@ -431,6 +462,13 @@ if (chatOutput) {
     chatOutput.addEventListener(
         "click",
         () => promptInput.focus()
+    );
+
+    chatOutput.addEventListener(
+        "scroll",
+        () => {
+            userNearBottom = isNearBottom();
+        }
     );
 
 }
