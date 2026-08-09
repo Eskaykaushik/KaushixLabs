@@ -103,3 +103,43 @@ if(themeToggle) {
 
     });
 }
+
+
+
+/* ==========================================
+   Kaushix Assistant
+========================================== */
+
+const ASSISTANT_API =
+    "https://kaushix-api-service.onrender.com/api/assistant";
+
+async function askAssistant(message) {
+
+    try {
+
+        const response = await fetch(ASSISTANT_API, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: message
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        return data.response;
+
+    } catch (error) {
+
+        console.error("Assistant error:", error);
+
+        return "Unable to reach Kaushix Assistant.";
+
+    }
+}
