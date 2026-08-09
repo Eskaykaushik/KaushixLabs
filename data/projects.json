@@ -27,6 +27,7 @@
       "links": {
         "paper": "",
         "github": "",
+        "pypi": "https://pypi.org/project/contractkit/",
         "demo": ""
       }
     },
@@ -55,6 +56,37 @@
       "links": {
         "paper": "",
         "github": "",
+        "demo": "https://www.kaggle.com/code/eskaykaushik/rgbtoinfragen"
+      }
+    },
+    {
+      "id": "pyantra",
+      "title": "Pyantra",
+      "category": "AI Agent Workflows",
+      "status": "Open Source",
+      "year": "2026",
+      "featured": true,
+      "description": "Typed, observable, reliable workflows for production AI agents. Build agent pipelines as typed graphs of nodes and edges with reliability, checkpoints, and observability built in by default.",
+      "highlights": [
+        "Typed node/edge graphs with compile-time validation",
+        "State merging with per-field reducers",
+        "Retries, backoff, timeouts and circuit breakers",
+        "Checkpoints, resume, and human-in-the-loop interrupt()",
+        "Parallel fan-out with sync and async execution",
+        "Zero dependencies — pure Python standard library"
+      ],
+      "technologies": [
+        "Python",
+        "GitHub Actions",
+        "uv",
+        "pytest",
+        "ruff",
+        "mypy"
+      ],
+      "links": {
+        "paper": "",
+        "github": "https://github.com/Eskaykaushik/pyantra",
+        "pypi": "https://pypi.org/project/pyantra/",
         "demo": ""
       }
     }
