@@ -478,11 +478,126 @@
 
 /* ---- Mobile ---- */
 
+/* ==========================================
+   CHAT BODY — mobile app feel
+========================================== */
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.menu-toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px;
+    width: 2.1rem;
+    height: 2.1rem;
+    align-items: center;
+    justify-content: center;
+    font-size: .9rem;
+    cursor: pointer;
+    transition: border-color .3s var(--ease), color .3s var(--ease);
+}
+
+.menu-toggle:hover,
+.menu-toggle.active {
+    border-color: var(--green);
+    color: var(--green);
+}
+
+@media (max-width: 768px) {
+
+    .chat-body header {
+        position: sticky;
+    }
+
+    .chat-body header .container {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .chat-body .navbar {
+        flex-direction: row;
+        justify-content: space-between;
+        height: 60px;
+        gap: 0;
+        padding: 0 1rem;
+    }
+
+    .chat-body .logo {
+        font-size: 20px;
+    }
+
+    .chat-body nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        background: var(--background);
+        border-bottom: 1px solid var(--border);
+        padding: .5rem 0;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, .25);
+    }
+
+    .chat-body nav.open {
+        display: flex;
+    }
+
+    .chat-body nav a {
+        padding: .8rem 1.25rem;
+        border-left: 2px solid transparent;
+    }
+
+    .chat-body nav a.active {
+        border-left-color: var(--green);
+    }
+
+    .menu-toggle {
+        display: inline-flex;
+    }
+
+    .chat-body .footer {
+        display: none;
+    }
+
+    .chat-body .page-header {
+        display: none;
+    }
+
+    .chat-body .chat-page {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+    .chat-body .chat-shell {
+        height: calc(100dvh - 60px);
+        min-height: 0;
+        max-width: none;
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+    }
+
+}
+
 @media (max-width: 600px) {
 
     .chat-shell {
-        height: calc(100dvh - 210px);
-        min-height: 420px;
+        height: calc(100dvh - 60px);
+        min-height: 0;
     }
 
     .chat-titlebar .chat-title {

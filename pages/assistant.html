@@ -38,7 +38,7 @@
 </head>
 
 
-<body>
+<body class="chat-body">
 
 
     <!-- ==========================================
@@ -55,7 +55,7 @@
 
             </a>
 
-            <nav>
+            <nav id="site-nav">
 
                 <a href="../research.html">Research</a>
 
@@ -63,15 +63,25 @@
 
                 <a href="../clients.html">Clients</a>
 
+                <a href="../tools.html">Tools</a>
+
                 <a href="../contact.html">Contact</a>
 
                 <a href="assistant.html" class="active">AI</a>
+
+            </nav>
+
+            <div class="nav-actions">
 
                 <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                     ☾
                 </button>
 
-            </nav>
+                <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" type="button">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+            </div>
 
         </div>
 
@@ -124,7 +134,7 @@
 
                         <span class="status-dot"></span>
 
-                        API ONLINE
+                        ONLINE
 
                     </span>
 
@@ -290,6 +300,33 @@
 
                     setTheme(current === "dark" ? "light" : "dark");
 
+                });
+
+            }
+
+        })();
+    </script>
+
+    <!-- Mobile menu toggle -->
+
+    <script>
+        (function () {
+
+            const menuToggle = document.getElementById("menu-toggle");
+            const siteNav = document.getElementById("site-nav");
+
+            if (menuToggle && siteNav) {
+
+                menuToggle.addEventListener("click", () => {
+                    siteNav.classList.toggle("open");
+                    menuToggle.classList.toggle("active");
+                });
+
+                siteNav.addEventListener("click", (event) => {
+                    if (event.target.tagName === "A") {
+                        siteNav.classList.remove("open");
+                        menuToggle.classList.remove("active");
+                    }
                 });
 
             }
