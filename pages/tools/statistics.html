@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Statistics Pack | Kaushix Labs Tools</title>
+
+    <meta name="description" content="Mean, median, mode, variance and std dev with live histogram and trend plots. Paste numbers or upload a CSV. A lightweight scientific tool from Kaushix Labs.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <script>
+        document.documentElement.setAttribute(
+            "data-theme",
+            localStorage.getItem("theme") || "dark"
+        );
+    </script>
+
+    <style>
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: .7rem;
+            padding: 1rem 1.3rem;
+        }
+
+        .stat-cell {
+            background: var(--term-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: .7rem .9rem;
+        }
+
+        .stat-cell .stat-label {
+            font-family: "JetBrains Mono", monospace;
+            font-size: .62rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: .35rem;
+        }
+
+        .stat-cell .stat-value {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 1rem;
+            color: var(--green);
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .stat-columns {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            padding: 0 1.3rem .4rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-columns label {
+            font-family: "JetBrains Mono", monospace;
+            font-size: .7rem;
+            letter-spacing: .12em;
+            color: var(--green);
+        }
+
+        .stat-columns select {
+            background: var(--term-surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: .4rem .7rem;
+            font-family: "JetBrains Mono", monospace;
+            font-size: .8rem;
+            outline: none;
+        }
+
+        .file-drop {
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: .85rem 1rem;
+            margin: 0 1.3rem .5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color .3s var(--ease), background-color .3s var(--ease);
+        }
+
+        .file-drop:hover,
+        .file-drop.dragover {
+            border-color: var(--green);
+            background: rgba(63, 185, 80, .05);
+        }
+
+        .file-drop p {
+            font-family: "JetBrains Mono", monospace;
+            font-size: .74rem;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .file-drop input[type="file"] {
+            display: none;
+        }
+
+        .file-meta {
+            font-family: "JetBrains Mono", monospace;
+            font-size: .7rem;
+            color: var(--green);
+            margin-top: .4rem;
+        }
+
+        .chart-card {
+            margin: .6rem 1.3rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #010409;
+        }
+
+        .chart-card .chart-title {
+            font-family: "JetBrains Mono", monospace;
+            font-size: .68rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: .6rem .9rem .2rem;
+        }
+
+        .chart-card canvas {
+            display: block;
+            width: 100%;
+            height: 230px;
+        }
+
+        .stat-output-empty {
+            padding: 1rem 1.3rem;
+            font-family: "JetBrains Mono", monospace;
+            font-size: .78rem;
+            color: var(--muted);
+        }
+
+        @media (max-width: 600px) {
+            .stat-grid {
+                padding: 1rem 1rem;
+            }
+
+            .file-drop {
+                margin: 0 1rem .5rem;
+            }
+
+            .chart-card {
+                margin: .6rem 1rem 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+
+        <div class="container navbar">
+
+            <a href="../../index.html" class="logo">
+                <span class="green">$</span> Kaushix Labs
+            </a>
+
+            <nav>
+                <a href="../../research.html">Research</a>
+                <a href="../../team.html">Our Team</a>
+                <a href="../../clients.html">Clients</a>
+                <a href="../../tools.html" class="active">Tools</a>
+                <a href="../../contact.html">Contact</a>
+                <a href="../assistant.html">AI</a>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    ☾
+                </button>
+            </nav>
+
+        </div>
+
+    </header>
+
+    <main class="tool-page">
+
+        <div class="tool-body">
+
+            <a href="../../tools.html" class="tool-back">
+                ← $ cd ../tools
+            </a>
+
+            <div class="tool-panel">
+
+                <div class="tool-titlebar">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green-dot"></span>
+                    <span class="terminal-title">statistics — kaushix tools</span>
+                </div>
+
+                <div class="tool-form">
+
+                    <label for="stat-input">dataset</label>
+
+                    <input
+                        id="stat-input"
+                        type="text"
+                        placeholder="1, 4, 2, 8, 5, 3, 7, 6, 9, 10"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+
+                    <p class="hint">
+                        Paste numbers separated by commas, spaces or newlines — or upload a CSV below.
+                        If the CSV has multiple columns, pick one to analyze.
+                    </p>
+
+                </div>
+
+                <div class="file-drop" id="file-drop">
+                    <p>⇧ drop a CSV file here, or click to browse</p>
+                    <input id="file-input" type="file" accept=".csv,text/csv">
+                    <div id="file-meta" class="file-meta"></div>
+                </div>
+
+                <div class="stat-columns" id="column-row" hidden>
+                    <label for="column-select">column</label>
+                    <select id="column-select"></select>
+                </div>
+
+                <div class="tool-actions">
+
+                    <button id="btn-analyze" class="tool-btn" type="button">
+                        $ analyze
+                    </button>
+
+                    <button id="btn-clear" class="tool-btn ghost" type="button">
+                        clear
+                    </button>
+
+                </div>
+
+                <div id="stat-stats" class="stat-grid" hidden></div>
+
+                <div id="stat-output" class="stat-output-empty">
+                    $ paste numbers or upload a CSV, then press analyze…
+                </div>
+
+                <div id="chart-hist" class="chart-card" hidden>
+                    <div class="chart-title">distribution (histogram)</div>
+                    <canvas id="hist-canvas"></canvas>
+                </div>
+
+                <div id="chart-trend" class="chart-card" hidden>
+                    <div class="chart-title">trend (index vs value)</div>
+                    <canvas id="trend-canvas"></canvas>
+                </div>
+
+                <div style="height: 1.3rem"></div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Theme toggle -->
+
+    <script>
+        (function () {
+
+            const toggle = document.getElementById("theme-toggle");
+
+            const setTheme = (theme) => {
+
+                document.documentElement.setAttribute("data-theme", theme);
+                localStorage.setItem("theme", theme);
+
+                if (toggle) {
+                    toggle.textContent = theme === "dark" ? "☀" : "☾";
+                }
+
+            };
+
+            if (toggle) {
+
+                toggle.addEventListener("click", () => {
+
+                    const current = document.documentElement.getAttribute("data-theme");
+
+                    setTheme(current === "dark" ? "light" : "dark");
+
+                });
+
+            }
+
+        })();
+    </script>
+
+    <script>
+        /* ==========================================
+           STATISTICS PACK — Kaushix Labs Tools
+        ========================================== */
+
+        const statInput = document.getElementById("stat-input");
+        const fileDrop = document.getElementById("file-drop");
+        const fileInput = document.getElementById("file-input");
+        const fileMeta = document.getElementById("file-meta");
+        const columnRow = document.getElementById("column-row");
+        const columnSelect = document.getElementById("column-select");
+        const statsGrid = document.getElementById("stat-stats");
+        const statOutput = document.getElementById("stat-output");
+        const chartHist = document.getElementById("chart-hist");
+        const chartTrend = document.getElementById("chart-trend");
+        const histCanvas = document.getElementById("hist-canvas");
+        const trendCanvas = document.getElementById("trend-canvas");
+        const btnAnalyze = document.getElementById("btn-analyze");
+        const btnClear = document.getElementById("btn-clear");
+
+        let csvData = null;
+        let csvHeaders = [];
+
+        /* ---------- data sources ---------- */
+
+        function numbersFromText(text) {
+            return text
+                .split(/[\s,;]+/)
+                .map(Number)
+                .filter(n => Number.isFinite(n));
+        }
+
+        function parseCSV(text) {
+            const rows = [];
+            let row = [], field = "", inQ = false;
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i];
+                if (inQ) {
+                    if (ch === '"') {
+                        if (text[i + 1] === '"') { field += '"'; i++; }
+                        else inQ = false;
+                    } else field += ch;
+                } else if (ch === '"') inQ = true;
+                else if (ch === ",") { row.push(field); field = ""; }
+                else if (ch === "\n") { row.push(field); rows.push(row); row = []; field = ""; }
+                else if (ch === "\r") { /* skip */ }
+                else field += ch;
+            }
+            if (field || row.length) { row.push(field); rows.push(row); }
+            return rows.filter(r => r.length && r.some(c => String(c).trim() !== ""));
+        }
+
+        function csvColumns(rows) {
+            if (!rows.length) return [];
+            const count = Math.max(...rows.map(r => r.length));
+            const cols = [];
+            for (let i = 0; i < count; i++) {
+                cols.push(rows.map(r => r[i] !== undefined ? r[i] : ""));
+            }
+            return cols;
+        }
+
+        function columnName(headers, i) {
+            if (headers && headers[i] && String(headers[i]).trim() !== "") {
+                return String(headers[i]).trim();
+            }
+            return "column " + (i + 1);
+        }
+
+        function detectHeader(rows) {
+            if (rows.length < 2) return [];
+            const first = rows[0];
+            const numeric = first.map(c => Number.isFinite(Number(String(c).trim())));
+            return numeric.every(v => v) ? [] : first.map(String);
+        }
+
+        function handleCSV(text) {
+            const rows = parseCSV(text);
+            csvHeaders = detectHeader(rows);
+            const dataRows = csvHeaders.length ? rows.slice(1) : rows;
+            csvData = { rows: dataRows, cols: csvColumns(dataRows), headers: csvHeaders };
+            rebuildColumnSelect();
+            fileMeta.textContent = "loaded: " + (csvHeaders.length ? dataRows.length : rows.length) +
+                " data rows × " + csvData.cols.length + " columns";
+        }
+
+        function rebuildColumnSelect() {
+            if (!csvData) return;
+            columnSelect.innerHTML = "";
+            csvData.cols.forEach((col, i) => {
+                const option = document.createElement("option");
+                option.value = String(i);
+                option.textContent = columnName(csvData.headers, i);
+                columnSelect.appendChild(option);
+            });
+            columnRow.hidden = csvData.cols.length <= 1;
+        }
+
+        fileDrop.addEventListener("click", () => fileInput.click());
+
+        fileDrop.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            fileDrop.classList.add("dragover");
+        });
+
+        fileDrop.addEventListener("dragleave", () => fileDrop.classList.remove("dragover"));
+
+        fileDrop.addEventListener("drop", (e) => {
+            e.preventDefault();
+            fileDrop.classList.remove("dragover");
+            const file = e.dataTransfer.files && e.dataTransfer.files[0];
+            if (file) readFile(file);
+        });
+
+        fileInput.addEventListener("change", () => {
+            const file = fileInput.files && fileInput.files[0];
+            if (file) readFile(file);
+        });
+
+        function readFile(file) {
+            const reader = new FileReader();
+            reader.onload = () => handleCSV(String(reader.result));
+            reader.onerror = () => { fileMeta.textContent = "! could not read file"; };
+            reader.readAsText(file);
+        }
+
+        /* ---------- statistics ---------- */
+
+        function analyze(data) {
+            const n = data.length;
+            if (!n) throw new Error("No numeric values found.");
+
+            const sorted = [...data].sort((a, b) => a - b);
+            const sum = data.reduce((a, b) => a + b, 0);
+            const mean = sum / n;
+            const median = n % 2
+                ? sorted[(n - 1) / 2]
+                : (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+
+            const freq = new Map();
+            for (const v of data) freq.set(v, (freq.get(v) || 0) + 1);
+            let maxFreq = 0;
+            for (const c of freq.values()) maxFreq = Math.max(maxFreq, c);
+            const modes = [];
+            for (const [v, c] of freq) if (c === maxFreq) modes.push(v);
+
+            const variance = data.reduce((a, v) => a + (v - mean) * (v - mean), 0) / n;
+            const sampleVariance = n > 1 ? data.reduce((a, v) => a + (v - mean) * (v - mean), 0) / (n - 1) : NaN;
+
+            return {
+                n,
+                sum,
+                min: sorted[0],
+                max: sorted[n - 1],
+                range: sorted[n - 1] - sorted[0],
+                mean,
+                median,
+                mode: modes.length === n ? null : modes,
+                variance,
+                std: Math.sqrt(variance),
+                sampleStd: Math.sqrt(sampleVariance)
+            };
+        }
+
+        function fmtStat(v) {
+            if (v === null || v === undefined) return "—";
+            if (typeof v === "number") {
+                if (!Number.isFinite(v)) return "—";
+                return String(parseFloat(v.toFixed(6)));
+            }
+            if (Array.isArray(v)) {
+                if (v.length > 3) return v.slice(0, 3).map(fmtStat).join(", ") + ", …";
+                return v.map(fmtStat).join(", ");
+            }
+            return String(v);
+        }
+
+        function renderStats(s) {
+            const cells = [
+                ["count", s.n],
+                ["sum", s.sum],
+                ["min", s.min],
+                ["max", s.max],
+                ["range", s.range],
+                ["mean", s.mean],
+                ["median", s.median],
+                ["mode", s.mode],
+                ["variance", s.variance],
+                ["std dev", s.std],
+                ["sample std", s.sampleStd]
+            ];
+            statsGrid.innerHTML = "";
+            for (const [label, value] of cells) {
+                const cell = document.createElement("div");
+                cell.className = "stat-cell";
+                const l = document.createElement("div");
+                l.className = "stat-label";
+                l.textContent = label;
+                const v = document.createElement("div");
+                v.className = "stat-value";
+                v.textContent = fmtStat(value);
+                cell.appendChild(l);
+                cell.appendChild(v);
+                statsGrid.appendChild(cell);
+            }
+            statsGrid.hidden = false;
+        }
+
+        /* ---------- charts ---------- */
+
+        function setupCanvas(canvas) {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = Math.max(1, Math.round(rect.width * dpr));
+            canvas.height = Math.max(1, Math.round(230 * dpr));
+            const ctx = canvas.getContext("2d");
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            return { ctx, w: rect.width, h: 230 };
+        }
+
+        function themeColors() {
+            const theme = document.documentElement.getAttribute("data-theme") || "dark";
+            return {
+                grid: theme === "dark" ? "rgba(255,255,255,.06)" : "rgba(0,0,0,.08)",
+                text: theme === "dark" ? "#8b949e" : "#57606a",
+                bar: "#3fb950",
+                line: "#3fb950",
+                axis: theme === "dark" ? "rgba(255,255,255,.35)" : "rgba(0,0,0,.35)"
+            };
+        }
+
+        function drawHistogram(data) {
+            chartHist.hidden = false;
+            const { ctx, w, h } = setupCanvas(histCanvas);
+            const c = themeColors();
+            const pad = { l: 46, r: 10, t: 10, b: 24 };
+
+            const n = data.length;
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const span = max - min;
+            if (span === 0) {
+                ctx.fillStyle = c.text;
+                ctx.font = "12px JetBrains Mono, monospace";
+                ctx.textAlign = "center";
+                ctx.fillText("constant data — no spread to bin", w / 2, h / 2);
+                return;
+            }
+            const bins = Math.min(30, Math.max(5, Math.ceil(Math.sqrt(n))));
+            const width = span / bins;
+            const counts = new Array(bins).fill(0);
+            for (const v of data) {
+                let idx = Math.floor((v - min) / width);
+                if (idx >= bins) idx = bins - 1;
+                counts[idx]++;
+            }
+            const maxCount = Math.max(...counts);
+
+            const plotW = w - pad.l - pad.r;
+            const plotH = h - pad.t - pad.b;
+            const bw = plotW / bins;
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.font = "10px JetBrains Mono, monospace";
+            ctx.textAlign = "center";
+
+            for (let i = 0; i < bins; i++) {
+                const bh = (counts[i] / maxCount) * plotH;
+                ctx.fillStyle = c.bar;
+                ctx.globalAlpha = 0.85;
+                ctx.fillRect(pad.l + i * bw + 1, pad.t + plotH - bh, bw - 2, bh);
+                ctx.globalAlpha = 1;
+            }
+
+            // x labels
+            ctx.fillStyle = c.text;
+            ctx.fillText(fmtStat(min), pad.l, h - 8);
+            ctx.fillText(fmtStat(max), w - pad.r - 30, h - 8);
+            const mid = min + span / 2;
+            ctx.fillText(fmtStat(mid), pad.l + plotW / 2, h - 8);
+        }
+
+        function drawTrend(data) {
+            chartTrend.hidden = false;
+            const { ctx, w, h } = setupCanvas(trendCanvas);
+            const c = themeColors();
+            const pad = { l: 46, r: 10, t: 10, b: 24 };
+            const plotW = w - pad.l - pad.r;
+            const plotH = h - pad.t - pad.b;
+
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const span = max - min || 1;
+
+            const X = (i) => pad.l + (i / (data.length - 1)) * plotW;
+            const Y = (v) => pad.t + plotH - ((v - min) / span) * plotH;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // horizontal gridlines
+            ctx.strokeStyle = c.grid;
+            ctx.fillStyle = c.text;
+            ctx.font = "10px JetBrains Mono, monospace";
+            ctx.textAlign = "right";
+            for (let g = 0; g <= 4; g++) {
+                const v = min + (span * g) / 4;
+                const y = Y(v);
+                ctx.beginPath();
+                ctx.moveTo(pad.l, y);
+                ctx.lineTo(w - pad.r, y);
+                ctx.stroke();
+                ctx.fillText(fmtStat(v), pad.l - 6, y + 4);
+            }
+
+            // line
+            ctx.strokeStyle = c.line;
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            for (let i = 0; i < data.length; i++) {
+                const x = X(i), y = Y(data[i]);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // points
+            ctx.fillStyle = c.line;
+            const maxPoints = 400;
+            const step = Math.max(1, Math.floor(data.length / maxPoints));
+            for (let i = 0; i < data.length; i += step) {
+                ctx.beginPath();
+                ctx.arc(X(i), Y(data[i]), 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        /* ---------- main ---------- */
+
+        function getData() {
+            if (csvData) {
+                const idx = parseInt(columnSelect.value, 10);
+                const col = csvData.cols[idx];
+                if (col) {
+                    const nums = col
+                        .map(v => Number(String(v).trim()))
+                        .filter(n => Number.isFinite(n));
+                    if (nums.length) return nums;
+                }
+                throw new Error("Selected CSV column has no numeric values.");
+            }
+            const nums = numbersFromText(statInput.value);
+            if (!nums.length) throw new Error("No numeric values found in the input.");
+            return nums;
+        }
+
+        function runAnalyze() {
+            try {
+                const data = getData();
+                const s = analyze(data);
+                renderStats(s);
+                drawHistogram(data);
+                drawTrend(data);
+                statOutput.textContent = "$ analyzed " + s.n + " values (source: " +
+                    (csvData ? "csv · " + columnSelect.selectedOptions[0].textContent : "pasted input") + ")";
+            } catch (e) {
+                statsGrid.hidden = true;
+                chartHist.hidden = true;
+                chartTrend.hidden = true;
+                statOutput.innerHTML = "";
+                const line = document.createElement("div");
+                line.className = "t-error";
+                line.textContent = "! " + e.message;
+                statOutput.appendChild(line);
+            }
+        }
+
+        function runClear() {
+            statInput.value = "";
+            csvData = null;
+            csvHeaders = [];
+            fileInput.value = "";
+            fileMeta.textContent = "";
+            columnRow.hidden = true;
+            statsGrid.hidden = true;
+            chartHist.hidden = true;
+            chartTrend.hidden = true;
+            statOutput.innerHTML = "";
+            const line = document.createElement("div");
+            line.textContent = "$ paste numbers or upload a CSV, then press analyze…";
+            statOutput.appendChild(line);
+            statInput.focus();
+        }
+
+        btnAnalyze.addEventListener("click", runAnalyze);
+        btnClear.addEventListener("click", runClear);
+
+        statInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                runAnalyze();
+            }
+        });
+
+        const observer = new MutationObserver(() => {
+            if (!chartHist.hidden && csvData) {
+                try {
+                    drawHistogram(getData());
+                    drawTrend(getData());
+                } catch (e) { /* ignore */ }
+            }
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+        statInput.focus();
+    </script>
+
+</body>
+
+</html>

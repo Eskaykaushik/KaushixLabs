@@ -1,0 +1,28 @@
+{
+    "tools": [
+        {
+            "id": "equation-solver",
+            "title": "Equation Solver",
+            "tag": "Math",
+            "icon": "fa-solid fa-equals",
+            "description": "Solve linear, quadratic, cubic and general equations step by step. Handles x^2 - 5x + 6 = 0, sin(x) = 0.5 and more.",
+            "path": "pages/tools/equation-solver.html"
+        },
+        {
+            "id": "function-plotter",
+            "title": "Function Plotter",
+            "tag": "Math",
+            "icon": "fa-solid fa-chart-line",
+            "description": "Interactive graph of y = f(x). Zoom with the scroll wheel, drag to pan. Plot sin(x), x^2, sqrt(x) and more.",
+            "path": "pages/tools/function-plotter.html"
+        },
+        {
+            "id": "statistics",
+            "title": "Statistics Pack",
+            "tag": "Stats",
+            "icon": "fa-solid fa-square-root-variable",
+            "description": "Mean, median, mode, variance and std dev for any dataset — paste numbers or upload a CSV, with live histograms and trend plots.",
+            "path": "pages/tools/statistics.html"
+        }
+    ]
+}

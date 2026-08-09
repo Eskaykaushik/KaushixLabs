@@ -5,10 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Clients | Kaushix Labs</title>
+    <title>Scientific Tools | Kaushix Labs</title>
 
-    <meta name="description"
-        content="Organizations that partner with Kaushix Labs for AI research, industry training and consultancy.">
+    <meta name="description" content="Small, lightweight scientific tools from Kaushix Labs: equation solvers, unit converters, data utilities and more.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,6 +15,7 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/tools.css">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
@@ -25,7 +25,6 @@
             localStorage.getItem("theme") || "dark"
         );
     </script>
-
 </head>
 
 <body>
@@ -39,18 +38,15 @@
             </a>
 
             <nav>
-
-<a href="research.html">Research</a>
-<a href="team.html">Our Team</a>
-<a href="clients.html" class="active">Clients</a>
-
-<a href="tools.html">Tools</a>
-<a href="contact.html">Contact</a>
-<a href="pages/assistant.html">AI</a>
+                <a href="research.html">Research</a>
+                <a href="team.html">Our Team</a>
+                <a href="clients.html">Clients</a>
+                <a href="tools.html" class="active">Tools</a>
+                <a href="contact.html">Contact</a>
+                <a href="pages/assistant.html">AI</a>
                 <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                     ☾
                 </button>
-
             </nav>
 
         </div>
@@ -63,22 +59,22 @@
 
             <section class="page-hero">
 
-                <p class="terminal-path">$ cd clients/</p>
+                <p class="terminal-path">$ cd tools/</p>
 
-                <h1>Our Clients</h1>
+                <h1>Scientific Tools</h1>
 
                 <p class="page-description">
-                    Organizations we've partnered with on AI research,
-                    industry training, and enterprise consultancy.
+                    Small, lightweight, dependency-free tools built by Kaushix Labs.
+                    Open-source, privacy-friendly, and fast.
                 </p>
 
             </section>
 
-            <!-- Clients are rendered dynamically from data/clients.json -->
-            <section id="clients-grid" class="client-grid">
+            <!-- Tools are rendered dynamically from data/tools.json -->
+            <section id="tools-grid" class="research-grid tools-grid">
 
-                <div class="loading">
-                    <p>$ loading clients...</p>
+                <div class="research-loading">
+                    <p>$ loading tools...</p>
                 </div>
 
             </section>
@@ -88,7 +84,7 @@
     </main>
 
     <script src="js/script.js"></script>
-    <script src="js/clients.js"></script>
+    <script src="js/tools.js"></script>
 
     <footer class="footer">
 
