@@ -458,7 +458,6 @@ nav a:hover{
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0;
-    margin-left: 1rem;
     opacity: 0.9;
     transition: opacity 0.25s var(--ease), transform 0.3s var(--ease), color 0.3s var(--ease);
     will-change: transform;
