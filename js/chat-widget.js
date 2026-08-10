@@ -35,6 +35,9 @@ const SUGGESTIONS = [
 const STREAM_CHUNK = 3;
 const STREAM_TICK_MS = 10;
 
+const STORE_KEY = "kaushix-chat-history";
+const HISTORY_LIMIT = 20;
+
 const MODEL_OPTIONS = MODELS.map(
     (model) => `<option value="${model.value}">${model.label}</option>`
 ).join("");
@@ -157,6 +160,8 @@ let firstOpen = true;
 let userNearBottom = true;
 let streamTimer = null;
 
+let history = loadHistory();
+
 
 function isNearBottom() {
 
@@ -206,10 +211,76 @@ function escapeHtml(text) {
 
 
 /* ==========================================
+   History persistence
+========================================== */
+
+function loadHistory() {
+
+    try {
+
+        const stored = JSON.parse(localStorage.getItem(STORE_KEY));
+
+        return Array.isArray(stored) ? stored : [];
+
+    } catch {
+
+        return [];
+
+    }
+
+}
+
+
+function saveHistory() {
+
+    try {
+
+        localStorage.setItem(STORE_KEY, JSON.stringify(history));
+
+    } catch {
+
+        // storage unavailable — keep history in memory only
+
+    }
+
+}
+
+
+function restoreHistory() {
+
+    if (!history.length) {
+        return;
+    }
+
+    firstOpen = false;
+
+    history.forEach((turn) => {
+
+        if (turn.role === "user") {
+
+            addUserMessage(turn.content);
+
+        } else if (turn.role === "assistant") {
+
+            const textEl = addAssistantMessage(turn.label || "k-core");
+
+            textEl.innerHTML = renderMarkdown(turn.content);
+            initCopyButtons(textEl);
+
+        }
+
+    });
+
+}
+
+
+/* ==========================================
    Open / close
 ========================================== */
 
 function init() {
+
+    restoreHistory();
 
     launcher.addEventListener("click", () => {
         const isOpen = panel.getAttribute("aria-hidden") === "false";
@@ -267,6 +338,10 @@ function closeChat() {
 function resetConversation() {
 
     clearStream();
+
+    history = [];
+    saveHistory();
+
     renderWelcome();
 
 }
@@ -624,7 +699,10 @@ async function askAssistant(message, model) {
             },
 
             body: JSON.stringify({
-                message: message
+                message: message,
+                history: history
+                    .slice(-HISTORY_LIMIT)
+                    .map(({ role, content }) => ({ role, content }))
             })
         }
     );
@@ -685,6 +763,15 @@ async function sendMessage(preset) {
         const textEl = addAssistantMessage(label);
 
         await streamResponse(textEl, answer);
+
+        history.push(
+            { role: "user", content: message },
+            { role: "assistant", content: answer, label }
+        );
+
+        history = history.slice(-HISTORY_LIMIT);
+
+        saveHistory();
 
     } catch (error) {
 
