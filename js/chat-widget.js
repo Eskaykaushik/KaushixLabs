@@ -45,13 +45,10 @@ const MODEL_OPTIONS = MODELS.map(
 const WIDGET_HTML = `
 <div class="chat-widget">
 
-    <button type="button" class="chat-launcher" id="chat-launcher"
+    <button type="button" class="chat-launcher attention" id="chat-launcher"
         aria-label="Open Kaushix AI chat" aria-expanded="false" aria-controls="chat-panel">
 
-        <svg class="chat-launcher-open" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 2C13 9 15 11 22 12C15 13 13 15 12 22C11 15 9 13 2 12C9 11 11 9 12 2Z"
-                fill="currentColor" />
-        </svg>
+        <i class="fas fa-terminal chat-launcher-open" aria-hidden="true"></i>
 
         <i class="fas fa-times chat-launcher-close" aria-hidden="true"></i>
     </button>
@@ -132,6 +129,12 @@ const WIDGET_HTML = `
 
 document.body.insertAdjacentHTML("beforeend", WIDGET_HTML);
 
+let firstOpen = true;
+let userNearBottom = true;
+let streamTimer = null;
+
+let history = loadHistory();
+
 const launcher = document.getElementById("chat-launcher");
 const panel = document.getElementById("chat-panel");
 const clearButton = document.getElementById("chat-clear");
@@ -155,13 +158,6 @@ if (launcher && panel) {
 /* ==========================================
    Primitives
 ========================================== */
-
-let firstOpen = true;
-let userNearBottom = true;
-let streamTimer = null;
-
-let history = loadHistory();
-
 
 function isNearBottom() {
 
