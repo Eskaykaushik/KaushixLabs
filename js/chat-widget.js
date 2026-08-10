@@ -109,12 +109,8 @@ const WIDGET_HTML = `
                 aria-label="Message to Kaushix AI"></textarea>
 
             <button type="button" class="chat-send" id="chat-send" aria-label="Send message">
-                <i class="fas fa-arrow-up" aria-hidden="true"></i>
-            </button>
-
-            <button type="button" class="chat-stop" id="chat-stop"
-                aria-label="Stop response" hidden>
-                <i class="fas fa-stop" aria-hidden="true"></i>
+                <i class="fas fa-arrow-up chat-send-icon" aria-hidden="true"></i>
+                <i class="fas fa-stop chat-stop-icon" aria-hidden="true"></i>
             </button>
 
         </div>
@@ -133,6 +129,7 @@ document.body.insertAdjacentHTML("beforeend", WIDGET_HTML);
 
 let firstOpen = true;
 let userNearBottom = true;
+let streaming = false;
 let abortController = null;
 let renderer = null;
 
@@ -146,7 +143,6 @@ const chatOutput = document.getElementById("chat-output");
 const chatInput = document.getElementById("chat-input");
 const modelSelect = document.getElementById("chat-model");
 const sendButton = document.getElementById("chat-send");
-const stopButton = document.getElementById("chat-stop");
 
 panel.inert = true;
 
@@ -289,9 +285,9 @@ function init() {
 
     clearButton.addEventListener("click", resetConversation);
 
-    sendButton.addEventListener("click", () => sendMessage());
-
-    stopButton.addEventListener("click", stopResponse);
+    sendButton.addEventListener("click", () => {
+        streaming ? stopResponse() : sendMessage();
+    });
 
     chatInput.addEventListener("keydown", (event) => {
         if (event.key === "Enter" && !event.shiftKey) {
@@ -397,15 +393,20 @@ function stopResponse() {
     }
 
     setStreaming(false);
-    sendButton.disabled = false;
 
 }
 
 
 function setStreaming(active) {
 
-    sendButton.hidden = active;
-    stopButton.hidden = !active;
+    streaming = active;
+
+    sendButton.classList.toggle("streaming", active);
+
+    sendButton.setAttribute(
+        "aria-label",
+        active ? "Stop response" : "Send message"
+    );
 
 }
 
@@ -818,7 +819,7 @@ async function sendMessage(preset) {
         typeof preset === "string" ? preset : chatInput.value
     ).trim();
 
-    if (!message || sendButton.disabled) {
+    if (!message || streaming) {
         return;
     }
 
@@ -832,7 +833,6 @@ async function sendMessage(preset) {
     const model = modelSelect.value;
     const label = modelLabel();
 
-    sendButton.disabled = true;
     setStreaming(true);
 
     abortController = new AbortController();
@@ -909,7 +909,6 @@ async function sendMessage(preset) {
     } finally {
 
         setStreaming(false);
-        sendButton.disabled = false;
 
     }
 
