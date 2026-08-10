@@ -25,41 +25,16 @@
     border-radius: 50%;
     border: none;
     background: linear-gradient(135deg, var(--green), var(--blue));
-    color: #fff;
+    color: #0d1117;
     cursor: pointer;
-    isolation: isolate;
-    box-shadow:
-        0 6px 18px rgba(0, 0, 0, .32),
-        0 0 22px rgba(88, 166, 255, .28),
-        0 0 22px rgba(63, 185, 80, .22),
-        inset 0 0 0 1px rgba(255, 255, 255, .18);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
     transition: transform .2s var(--ease), box-shadow .2s var(--ease),
         background .2s var(--ease);
 }
 
-.chat-launcher::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, .38), rgba(255, 255, 255, .1) 46%, transparent 62%);
-    z-index: -1;
-    pointer-events: none;
-}
-
-.chat-launcher > * {
-    position: relative;
-    z-index: 1;
-}
-
 .chat-launcher:hover {
     transform: translateY(-2px) scale(1.05);
-    box-shadow:
-        0 12px 28px rgba(0, 0, 0, .38),
-        0 0 28px rgba(88, 166, 255, .38),
-        0 0 28px rgba(63, 185, 80, .3),
-        inset 0 0 0 1px rgba(255, 255, 255, .22);
+    box-shadow: 0 10px 26px rgba(63, 185, 80, .35);
 }
 
 .chat-launcher:active {
@@ -67,8 +42,28 @@
 }
 
 .chat-launcher .chat-launcher-open {
-    font-size: 24px;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .28));
+    font-size: 22px;
+}
+
+.chat-launcher.attention::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 2px solid rgba(88, 166, 255, .55);
+    pointer-events: none;
+    animation: launcher-ping 1.5s var(--ease) 3 backwards;
+}
+
+@keyframes launcher-ping {
+    0% {
+        transform: scale(1);
+        opacity: .9;
+    }
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
 }
 
 .chat-launcher .chat-launcher-close {
@@ -81,6 +76,10 @@
     color: var(--muted);
     border: 1px solid var(--border);
     box-shadow: 0 6px 20px rgba(0, 0, 0, .2);
+}
+
+.chat-launcher.active::after {
+    display: none;
 }
 
 .chat-launcher.active::before {
