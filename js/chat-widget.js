@@ -11,7 +11,9 @@ const ENDPOINTS = {
     fast: "/api/fast",
     reason: "/api/reason",
     research: "/api/research",
-    compound: "/api/compound"
+    compound: "/api/compound",
+    coder: "/api/coder",
+    poet: "/api/poet"
 };
 
 const MODELS = [
@@ -19,7 +21,9 @@ const MODELS = [
     { value: "fast", label: "k-spark" },
     { value: "reason", label: "k-mind" },
     { value: "research", label: "k-atlas" },
-    { value: "compound", label: "k-nexus" }
+    { value: "compound", label: "k-nexus" },
+    { value: "coder", label: "k-code" },
+    { value: "poet", label: "k-poet" }
 ];
 
 const AI_NAME = "kaushix-ai";
