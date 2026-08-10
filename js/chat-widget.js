@@ -32,9 +32,6 @@ const SUGGESTIONS = [
     "Give me 5 ideas for AI startup projects"
 ];
 
-const STREAM_CHUNK = 3;
-const STREAM_TICK_MS = 10;
-
 const STORE_KEY = "kaushix-chat-history";
 const HISTORY_LIMIT = 20;
 
@@ -115,6 +112,11 @@ const WIDGET_HTML = `
                 <i class="fas fa-arrow-up" aria-hidden="true"></i>
             </button>
 
+            <button type="button" class="chat-stop" id="chat-stop"
+                aria-label="Stop response" hidden>
+                <i class="fas fa-stop" aria-hidden="true"></i>
+            </button>
+
         </div>
 
     </div>
@@ -131,8 +133,6 @@ document.body.insertAdjacentHTML("beforeend", WIDGET_HTML);
 
 let firstOpen = true;
 let userNearBottom = true;
-let streamTimer = null;
-let streamResolver = null;
 let abortController = null;
 let renderer = null;
 
@@ -146,6 +146,7 @@ const chatOutput = document.getElementById("chat-output");
 const chatInput = document.getElementById("chat-input");
 const modelSelect = document.getElementById("chat-model");
 const sendButton = document.getElementById("chat-send");
+const stopButton = document.getElementById("chat-stop");
 
 panel.inert = true;
 
@@ -290,6 +291,8 @@ function init() {
 
     sendButton.addEventListener("click", () => sendMessage());
 
+    stopButton.addEventListener("click", stopResponse);
+
     chatInput.addEventListener("keydown", (event) => {
         if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
@@ -376,23 +379,33 @@ function trapFocus(event) {
 
 function resetConversation() {
 
-    clearStream();
+    stopResponse();
+
+    history = [];
+    saveHistory();
+
+    renderWelcome();
+
+}
+
+
+function stopResponse() {
 
     if (abortController) {
         abortController.abort();
         abortController = null;
     }
 
-    if (streamResolver) {
-        const resolve = streamResolver;
-        streamResolver = null;
-        resolve();
-    }
+    setStreaming(false);
+    sendButton.disabled = false;
 
-    history = [];
-    saveHistory();
+}
 
-    renderWelcome();
+
+function setStreaming(active) {
+
+    sendButton.hidden = active;
+    stopButton.hidden = !active;
 
 }
 
@@ -674,64 +687,20 @@ function addError(message) {
 }
 
 
-function streamResponse(container, fullText) {
-
-    return new Promise((resolve) => {
-
-        clearStream();
-
-        streamResolver = resolve;
-
-        let index = 0;
-
-        container.classList.add("streaming");
-
-        streamTimer = setInterval(() => {
-
-            index += STREAM_CHUNK;
-
-            container.textContent = fullText.slice(0, index);
-
-            scrollToBottom({ smooth: false });
-
-            if (index >= fullText.length) {
-
-                clearInterval(streamTimer);
-                streamTimer = null;
-                streamResolver = null;
-
-                container.innerHTML = renderMarkdown(fullText);
-                initCopyButtons(container);
-                container.classList.remove("streaming");
-
-                scrollToBottom();
-
-                resolve();
-
-            }
-
-        }, STREAM_TICK_MS);
-
-    });
-
-}
-
-
-function clearStream() {
-
-    if (streamTimer) {
-        clearInterval(streamTimer);
-        streamTimer = null;
-    }
-
-}
-
-
 /* ==========================================
    API
 ========================================== */
 
-async function askAssistant(message, model) {
+function buildHistoryPayload() {
+
+    return history
+        .slice(-HISTORY_LIMIT)
+        .map(({ role, content }) => ({ role, content }));
+
+}
+
+
+async function askAssistant(message, model, onChunk, signal) {
 
     const endpoint = ENDPOINTS[model];
 
@@ -740,7 +709,7 @@ async function askAssistant(message, model) {
     }
 
     const response = await fetch(
-        API_URL.replace(/\/+$/, "") + endpoint,
+        API_URL.replace(/\/+$/, "") + endpoint + "?stream=1",
         {
             method: "POST",
 
@@ -748,13 +717,11 @@ async function askAssistant(message, model) {
                 "Content-Type": "application/json"
             },
 
-            signal: abortController ? abortController.signal : undefined,
+            signal: signal,
 
             body: JSON.stringify({
                 message: message,
-                history: history
-                    .slice(-HISTORY_LIMIT)
-                    .map(({ role, content }) => ({ role, content }))
+                history: buildHistoryPayload()
             })
         }
     );
@@ -765,9 +732,68 @@ async function askAssistant(message, model) {
         );
     }
 
-    const data = await response.json();
+    if (!response.body || typeof onChunk !== "function") {
+        const data = await response.json();
+        return data.response;
+    }
 
-    return data.response;
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let fullText = "";
+
+    while (true) {
+
+        const { done, value } = await reader.read();
+
+        if (done) {
+            break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+
+        const frames = buffer.split("\n\n");
+        buffer = frames.pop();
+
+        for (const frame of frames) {
+
+            for (const line of frame.split("\n")) {
+
+                if (!line.startsWith("data:")) {
+                    continue;
+                }
+
+                const data = line.slice(5).trim();
+
+                if (!data || data === "[DONE]") {
+                    continue;
+                }
+
+                let parsed;
+
+                try {
+                    parsed = JSON.parse(data);
+                } catch {
+                    continue;
+                }
+
+                if (parsed.error) {
+                    throw new Error(parsed.error);
+                }
+
+                if (parsed.content) {
+                    fullText += parsed.content;
+                    onChunk(fullText);
+                }
+
+            }
+
+        }
+
+    }
+
+    return fullText;
+
 }
 
 
@@ -803,29 +829,54 @@ async function sendMessage(preset) {
     const label = modelLabel();
 
     sendButton.disabled = true;
-
-    const typing = addTypingIndicator();
+    setStreaming(true);
 
     abortController = new AbortController();
     const controller = abortController;
 
+    const typing = addTypingIndicator();
+
+    let textEl = null;
+
+    const showChunk = (fullText) => {
+
+        if (controller.signal.aborted) {
+            return;
+        }
+
+        if (!textEl) {
+            typing.remove();
+            textEl = addAssistantMessage(label);
+        }
+
+        textEl.textContent = fullText;
+        scrollToBottom({ smooth: false });
+
+    };
+
+    const finalize = (content) => {
+
+        if (!textEl) {
+            typing.remove();
+            textEl = addAssistantMessage(label);
+        }
+
+        textEl.innerHTML = renderMarkdown(content);
+        initCopyButtons(textEl);
+        scrollToBottom();
+
+    };
+
     try {
 
-        const answer = await askAssistant(message, model);
-
-        typing.remove();
+        const answer = await askAssistant(message, model, showChunk, controller.signal);
 
         if (controller.signal.aborted) {
+            finalize(textEl ? textEl.textContent : answer);
             return;
         }
 
-        const textEl = addAssistantMessage(label);
-
-        await streamResponse(textEl, answer);
-
-        if (controller.signal.aborted) {
-            return;
-        }
+        finalize(answer);
 
         history.push(
             { role: "user", content: message },
@@ -841,17 +892,19 @@ async function sendMessage(preset) {
         typing.remove();
 
         if (controller.signal.aborted) {
+            if (textEl && textEl.textContent) {
+                finalize(textEl.textContent);
+            }
             return;
         }
 
         console.error("Assistant error:", error);
 
-        clearStream();
-
         addError("! " + error.message);
 
     } finally {
 
+        setStreaming(false);
         sendButton.disabled = false;
 
     }
