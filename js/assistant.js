@@ -354,6 +354,8 @@ async function sendMessage(preset) {
     promptInput.value = "";
     resizeInput();
 
+    promptInput.blur();
+
     addUserMessage(message);
 
     const model = modelSelect.value;
@@ -384,8 +386,6 @@ async function sendMessage(preset) {
     } finally {
 
         sendButton.disabled = false;
-
-        promptInput.focus();
 
     }
 
