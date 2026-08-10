@@ -1,5 +1,6 @@
 /* ==========================================
-   Kaushix AI — DocNest-style chat
+   Kaushix AI — floating chat widget
+   DocNest-style launcher + panel on every page
 ========================================== */
 
 const API_URL =
@@ -12,6 +13,14 @@ const ENDPOINTS = {
     research: "/api/research",
     compound: "/api/compound"
 };
+
+const MODELS = [
+    { value: "assistant", label: "k-core" },
+    { value: "fast", label: "k-spark" },
+    { value: "reason", label: "k-mind" },
+    { value: "research", label: "k-atlas" },
+    { value: "compound", label: "k-nexus" }
+];
 
 const AI_NAME = "kaushix-ai";
 const USER_NAME = "you";
@@ -26,22 +35,125 @@ const SUGGESTIONS = [
 const STREAM_CHUNK = 3;
 const STREAM_TICK_MS = 10;
 
+const MODEL_OPTIONS = MODELS.map(
+    (model) => `<option value="${model.value}">${model.label}</option>`
+).join("");
+
+const WIDGET_HTML = `
+<div class="chat-widget">
+
+    <button type="button" class="chat-launcher" id="chat-launcher"
+        aria-label="Open Kaushix AI chat" aria-expanded="false" aria-controls="chat-panel">
+
+        <svg class="chat-launcher-open" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2C13 9 15 11 22 12C15 13 13 15 12 22C11 15 9 13 2 12C9 11 11 9 12 2Z"
+                fill="currentColor" />
+        </svg>
+
+        <i class="fas fa-times chat-launcher-close" aria-hidden="true"></i>
+    </button>
+
+    <div class="chat-panel" id="chat-panel" role="dialog" aria-label="Kaushix AI chat"
+        aria-hidden="true">
+
+        <header class="chat-titlebar">
+
+            <div class="chat-heading">
+
+                <span class="chat-avatar" aria-hidden="true">
+                    <i class="fas fa-terminal"></i>
+                </span>
+
+                <div class="chat-heading-text">
+
+                    <span class="chat-title">${AI_NAME}</span>
+
+                    <span class="chat-subtitle">
+                        <span class="status-dot"></span>
+                        online
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="chat-tools">
+
+                <div class="ai-model">
+
+                    <label for="chat-model">model</label>
+
+                    <select id="chat-model" aria-label="Choose model">
+                        ${MODEL_OPTIONS}
+                    </select>
+
+                </div>
+
+                <button type="button" class="chat-action" id="chat-clear"
+                    title="Clear chat" aria-label="Clear chat">
+                    <i class="fas fa-eraser" aria-hidden="true"></i>
+                </button>
+
+                <button type="button" class="chat-action" id="chat-close"
+                    title="Close" aria-label="Close chat">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+
+            </div>
+
+        </header>
+
+        <div class="chat-output" id="chat-output" aria-live="polite"></div>
+
+        <div class="chat-input-line">
+
+            <textarea id="chat-input" rows="1"
+                placeholder="Ask anything — code, research, or plain questions…"
+                aria-label="Message to Kaushix AI"></textarea>
+
+            <button type="button" class="chat-send" id="chat-send" aria-label="Send message">
+                <i class="fas fa-arrow-up" aria-hidden="true"></i>
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+`;
+
 
 /* ==========================================
-   DOM Elements
+   Inject widget
 ========================================== */
 
+document.body.insertAdjacentHTML("beforeend", WIDGET_HTML);
+
+const launcher = document.getElementById("chat-launcher");
+const panel = document.getElementById("chat-panel");
+const clearButton = document.getElementById("chat-clear");
+const closeButton = document.getElementById("chat-close");
 const chatOutput = document.getElementById("chat-output");
-const promptInput = document.getElementById("prompt");
-const modelSelect = document.getElementById("model");
-const sendButton = document.getElementById("send");
-const newChatButton = document.getElementById("new-chat");
+const chatInput = document.getElementById("chat-input");
+const modelSelect = document.getElementById("chat-model");
+const sendButton = document.getElementById("chat-send");
+
+const chatColumn = el("div", "chat-column");
+
+if (chatOutput) {
+    chatOutput.appendChild(chatColumn);
+}
+
+if (launcher && panel) {
+    init();
+}
 
 
 /* ==========================================
    Primitives
 ========================================== */
 
+let firstOpen = true;
 let userNearBottom = true;
 let streamTimer = null;
 
@@ -82,17 +194,6 @@ function el(tag, className) {
 }
 
 
-function makeAvatar() {
-
-    const avatar = el("div", "msg-avatar");
-
-    avatar.innerHTML = '<i class="fas fa-terminal"></i>';
-
-    return avatar;
-
-}
-
-
 function escapeHtml(text) {
 
     const div = document.createElement("div");
@@ -105,37 +206,127 @@ function escapeHtml(text) {
 
 
 /* ==========================================
+   Open / close
+========================================== */
+
+function init() {
+
+    launcher.addEventListener("click", () => {
+        const isOpen = panel.getAttribute("aria-hidden") === "false";
+        isOpen ? closeChat() : openChat();
+    });
+
+    closeButton.addEventListener("click", closeChat);
+
+    clearButton.addEventListener("click", resetConversation);
+
+    sendButton.addEventListener("click", () => sendMessage());
+
+    chatInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && panel.getAttribute("aria-hidden") === "false") {
+            closeChat();
+            launcher.focus();
+        }
+    });
+
+}
+
+
+function openChat() {
+
+    panel.setAttribute("aria-hidden", "false");
+    launcher.setAttribute("aria-expanded", "true");
+    launcher.classList.add("active");
+
+    if (firstOpen) {
+        firstOpen = false;
+        renderWelcome();
+    }
+
+    chatInput.focus();
+
+}
+
+
+function closeChat() {
+
+    panel.setAttribute("aria-hidden", "true");
+    launcher.setAttribute("aria-expanded", "false");
+    launcher.classList.remove("active");
+
+}
+
+
+function resetConversation() {
+
+    clearStream();
+    renderWelcome();
+
+}
+
+
+/* ==========================================
    Markdown rendering (marked + highlight.js)
 ========================================== */
 
-const renderer = new marked.Renderer();
+let renderer = null;
 
-renderer.code = (code, infoString) => {
 
-    const language = (infoString || "text").trim().split(/\s+/)[0];
-    const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
-    const highlighted = hljs.highlight(code, { language: validLanguage }).value;
-    const label = hljs.getLanguage(language)
-        ? hljs.getLanguage(language).name
-        : (validLanguage === "plaintext" ? "text" : validLanguage);
+function buildRenderer() {
 
-    return `
-        <div class="code-block">
-            <div class="code-block-header">
-                <span class="code-lang">${escapeHtml(label)}</span>
-                <button type="button" class="copy-btn" data-code="${encodeURIComponent(code)}">
-                    <i class="far fa-copy"></i>
-                    <span class="copy-label">Copy</span>
-                </button>
+    renderer = new marked.Renderer();
+
+    renderer.code = (code, infoString) => {
+
+        if (typeof hljs === "undefined") {
+
+            return `<pre><code class="hljs">${escapeHtml(code)}</code></pre>`;
+
+        }
+
+        const language = (infoString || "text").trim().split(/\s+/)[0];
+        const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
+        const highlighted = hljs.highlight(code, { language: validLanguage }).value;
+        const label = hljs.getLanguage(language)
+            ? hljs.getLanguage(language).name
+            : (validLanguage === "plaintext" ? "text" : validLanguage);
+
+        return `
+            <div class="code-block">
+                <div class="code-block-header">
+                    <span class="code-lang">${escapeHtml(label)}</span>
+                    <button type="button" class="copy-btn" data-code="${encodeURIComponent(code)}">
+                        <i class="far fa-copy"></i>
+                        <span class="copy-label">Copy</span>
+                    </button>
+                </div>
+                <pre><code class="hljs language-${validLanguage}">${highlighted}</code></pre>
             </div>
-            <pre><code class="hljs language-${validLanguage}">${highlighted}</code></pre>
-        </div>
-    `;
+        `;
 
-};
+    };
+
+}
 
 
 function renderMarkdown(text) {
+
+    if (typeof marked === "undefined") {
+
+        return "<p>" + escapeHtml(text).replace(/\n/g, "<br>") + "</p>";
+
+    }
+
+    if (!renderer) {
+        buildRenderer();
+    }
 
     marked.setOptions({
         gfm: true,
@@ -192,8 +383,7 @@ function initCopyButtons(container) {
 
 function renderWelcome() {
 
-    chatOutput.innerHTML = "";
-    clearStream();
+    chatColumn.innerHTML = "";
 
     const welcome = el("div", "welcome");
 
@@ -234,9 +424,11 @@ function renderWelcome() {
     welcome.appendChild(sub);
     welcome.appendChild(chips);
 
-    chatOutput.appendChild(welcome);
+    chatColumn.appendChild(welcome);
 
-    promptInput.focus();
+    if (panel.getAttribute("aria-hidden") === "false") {
+        chatInput.focus();
+    }
 
 }
 
@@ -264,7 +456,7 @@ function addUserMessage(text) {
 
     msg.appendChild(body);
 
-    chatOutput.appendChild(msg);
+    chatColumn.appendChild(msg);
 
     scrollToBottom();
 
@@ -289,11 +481,22 @@ function addAssistantMessage(modelLabel) {
     msg.appendChild(makeAvatar());
     msg.appendChild(body);
 
-    chatOutput.appendChild(msg);
+    chatColumn.appendChild(msg);
 
     scrollToBottom();
 
     return text;
+
+}
+
+
+function makeAvatar() {
+
+    const avatar = el("div", "msg-avatar");
+
+    avatar.innerHTML = '<i class="fas fa-terminal"></i>';
+
+    return avatar;
 
 }
 
@@ -313,7 +516,7 @@ function addTypingIndicator() {
     msg.appendChild(makeAvatar());
     msg.appendChild(body);
 
-    chatOutput.appendChild(msg);
+    chatColumn.appendChild(msg);
 
     scrollToBottom();
 
@@ -342,7 +545,7 @@ function addError(message) {
     msg.appendChild(makeAvatar());
     msg.appendChild(body);
 
-    chatOutput.appendChild(msg);
+    chatColumn.appendChild(msg);
 
     scrollToBottom();
 
@@ -452,17 +655,17 @@ function modelLabel() {
 async function sendMessage(preset) {
 
     const message = (
-        typeof preset === "string" ? preset : promptInput.value
+        typeof preset === "string" ? preset : chatInput.value
     ).trim();
 
     if (!message || sendButton.disabled) {
         return;
     }
 
-    promptInput.value = "";
+    chatInput.value = "";
     resizeInput();
 
-    promptInput.blur();
+    chatInput.blur();
 
     addUserMessage(message);
 
@@ -508,86 +711,33 @@ async function sendMessage(preset) {
 
 function resizeInput() {
 
-    promptInput.style.height = "auto";
+    chatInput.style.height = "auto";
 
-    promptInput.style.height = promptInput.scrollHeight + "px";
+    chatInput.style.height = chatInput.scrollHeight + "px";
 
 }
 
 
 /* ==========================================
-   Events
+   Output events
 ========================================== */
 
-if (sendButton) {
+chatOutput.addEventListener("scroll", () => {
+    userNearBottom = isNearBottom();
+});
 
-    sendButton.addEventListener(
-        "click",
-        () => sendMessage()
-    );
-
-}
-
-
-if (newChatButton) {
-
-    newChatButton.addEventListener(
-        "click",
-        renderWelcome
-    );
-
-}
+chatOutput.addEventListener("click", () => {
+    if (panel.getAttribute("aria-hidden") === "false") {
+        chatInput.focus();
+    }
+});
 
 
-if (promptInput) {
+if (chatInput) {
 
-    promptInput.addEventListener(
+    chatInput.addEventListener(
         "input",
         resizeInput
     );
 
-    promptInput.addEventListener(
-        "keydown",
-        (event) => {
-
-            if (
-                event.key === "Enter" &&
-                !event.shiftKey
-            ) {
-
-                event.preventDefault();
-
-                sendMessage();
-
-            }
-
-        }
-    );
-
 }
-
-
-if (chatOutput) {
-
-    chatOutput.addEventListener(
-        "click",
-        () => promptInput.focus()
-    );
-
-    chatOutput.addEventListener(
-        "scroll",
-        () => {
-            userNearBottom = isNearBottom();
-        }
-    );
-
-}
-
-
-/* ==========================================
-   Init
-========================================== */
-
-renderWelcome();
-
-promptInput.focus();
