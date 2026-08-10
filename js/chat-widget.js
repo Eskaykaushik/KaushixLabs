@@ -132,6 +132,7 @@ document.body.insertAdjacentHTML("beforeend", WIDGET_HTML);
 let firstOpen = true;
 let userNearBottom = true;
 let streamTimer = null;
+let renderer = null;
 
 let history = loadHistory();
 
@@ -148,10 +149,6 @@ const chatColumn = el("div", "chat-column");
 
 if (chatOutput) {
     chatOutput.appendChild(chatColumn);
-}
-
-if (launcher && panel) {
-    init();
 }
 
 
@@ -346,9 +343,6 @@ function resetConversation() {
 /* ==========================================
    Markdown rendering (marked + highlight.js)
 ========================================== */
-
-let renderer = null;
-
 
 function buildRenderer() {
 
@@ -823,4 +817,13 @@ if (chatInput) {
         resizeInput
     );
 
+}
+
+
+/* ==========================================
+   Boot — all declarations are above this point
+========================================== */
+
+if (launcher && panel) {
+    init();
 }
