@@ -132,6 +132,9 @@ document.body.insertAdjacentHTML("beforeend", WIDGET_HTML);
 let firstOpen = true;
 let userNearBottom = true;
 let streamTimer = null;
+let streamResolver = null;
+let abortController = null;
+let renderer = null;
 
 let history = loadHistory();
 
@@ -144,14 +147,12 @@ const chatInput = document.getElementById("chat-input");
 const modelSelect = document.getElementById("chat-model");
 const sendButton = document.getElementById("chat-send");
 
+panel.inert = true;
+
 const chatColumn = el("div", "chat-column");
 
 if (chatOutput) {
     chatOutput.appendChild(chatColumn);
-}
-
-if (launcher && panel) {
-    init();
 }
 
 
@@ -296,6 +297,8 @@ function init() {
         }
     });
 
+    panel.addEventListener("keydown", trapFocus);
+
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && panel.getAttribute("aria-hidden") === "false") {
             closeChat();
@@ -307,6 +310,8 @@ function init() {
 
 
 function openChat() {
+
+    panel.inert = false;
 
     panel.setAttribute("aria-hidden", "false");
     launcher.setAttribute("aria-expanded", "true");
@@ -324,9 +329,47 @@ function openChat() {
 
 function closeChat() {
 
+    panel.inert = true;
+
     panel.setAttribute("aria-hidden", "true");
     launcher.setAttribute("aria-expanded", "false");
     launcher.classList.remove("active");
+
+    if (panel.contains(document.activeElement)) {
+        launcher.focus();
+    }
+
+}
+
+
+function trapFocus(event) {
+
+    if (event.key !== "Tab") {
+        return;
+    }
+
+    const focusables = panel.querySelectorAll(
+        "button, [href], input, select, textarea, [tabindex]:not([tabindex=\"-1\"])"
+    );
+
+    const list = [...focusables].filter(
+        (element) => !element.disabled && element.offsetParent !== null
+    );
+
+    if (!list.length) {
+        return;
+    }
+
+    const first = list[0];
+    const last = list[list.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+    }
 
 }
 
@@ -334,6 +377,17 @@ function closeChat() {
 function resetConversation() {
 
     clearStream();
+
+    if (abortController) {
+        abortController.abort();
+        abortController = null;
+    }
+
+    if (streamResolver) {
+        const resolve = streamResolver;
+        streamResolver = null;
+        resolve();
+    }
 
     history = [];
     saveHistory();
@@ -346,9 +400,6 @@ function resetConversation() {
 /* ==========================================
    Markdown rendering (marked + highlight.js)
 ========================================== */
-
-let renderer = null;
-
 
 function buildRenderer() {
 
@@ -629,6 +680,8 @@ function streamResponse(container, fullText) {
 
         clearStream();
 
+        streamResolver = resolve;
+
         let index = 0;
 
         container.classList.add("streaming");
@@ -645,6 +698,7 @@ function streamResponse(container, fullText) {
 
                 clearInterval(streamTimer);
                 streamTimer = null;
+                streamResolver = null;
 
                 container.innerHTML = renderMarkdown(fullText);
                 initCopyButtons(container);
@@ -693,6 +747,8 @@ async function askAssistant(message, model) {
             headers: {
                 "Content-Type": "application/json"
             },
+
+            signal: abortController ? abortController.signal : undefined,
 
             body: JSON.stringify({
                 message: message,
@@ -750,15 +806,26 @@ async function sendMessage(preset) {
 
     const typing = addTypingIndicator();
 
+    abortController = new AbortController();
+    const controller = abortController;
+
     try {
 
         const answer = await askAssistant(message, model);
 
         typing.remove();
 
+        if (controller.signal.aborted) {
+            return;
+        }
+
         const textEl = addAssistantMessage(label);
 
         await streamResponse(textEl, answer);
+
+        if (controller.signal.aborted) {
+            return;
+        }
 
         history.push(
             { role: "user", content: message },
@@ -771,11 +838,15 @@ async function sendMessage(preset) {
 
     } catch (error) {
 
+        typing.remove();
+
+        if (controller.signal.aborted) {
+            return;
+        }
+
         console.error("Assistant error:", error);
 
         clearStream();
-
-        typing.remove();
 
         addError("! " + error.message);
 
@@ -823,4 +894,13 @@ if (chatInput) {
         resizeInput
     );
 
+}
+
+
+/* ==========================================
+   Boot — all declarations are above this point
+========================================== */
+
+if (launcher && panel) {
+    init();
 }
