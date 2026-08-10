@@ -48,10 +48,7 @@ const WIDGET_HTML = `
     <button type="button" class="chat-launcher" id="chat-launcher"
         aria-label="Open Kaushix AI chat" aria-expanded="false" aria-controls="chat-panel">
 
-        <svg class="chat-launcher-open" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 2C13 9 15 11 22 12C15 13 13 15 12 22C11 15 9 13 2 12C9 11 11 9 12 2Z"
-                fill="currentColor" />
-        </svg>
+        <i class="fas fa-terminal chat-launcher-open" aria-hidden="true"></i>
 
         <i class="fas fa-times chat-launcher-close" aria-hidden="true"></i>
     </button>
