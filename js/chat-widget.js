@@ -732,7 +732,11 @@ async function askAssistant(message, model, onChunk, signal) {
         );
     }
 
-    if (!response.body || typeof onChunk !== "function") {
+    const contentType = response.headers.get("content-type") || "";
+
+    const isStream = contentType.includes("text/event-stream");
+
+    if (!response.body || typeof onChunk !== "function" || !isStream) {
         const data = await response.json();
         return data.response;
     }
