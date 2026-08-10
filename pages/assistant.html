@@ -26,6 +26,9 @@
     <link rel="stylesheet" href="../css/chat.css">
 
     <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
+    <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <script>
@@ -38,7 +41,7 @@
 </head>
 
 
-<body>
+<body class="chat-body">
 
 
     <!-- ==========================================
@@ -55,7 +58,7 @@
 
             </a>
 
-            <nav>
+            <nav id="site-nav">
 
                 <a href="../research.html">Research</a>
 
@@ -63,15 +66,25 @@
 
                 <a href="../clients.html">Clients</a>
 
+                <a href="../tools.html">Tools</a>
+
                 <a href="../contact.html">Contact</a>
 
                 <a href="assistant.html" class="active">AI</a>
+
+            </nav>
+
+            <div class="nav-actions">
 
                 <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
                     ☾
                 </button>
 
-            </nav>
+                <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" type="button">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+            </div>
 
         </div>
 
@@ -93,15 +106,6 @@
                 ./kaushix-ai
             </div>
 
-            <h1>
-                Kaushix AI
-            </h1>
-
-            <p>
-                A shared AI gateway. Ask a question, press Enter,
-                and the model answers right here in the terminal.
-            </p>
-
         </section>
 
 
@@ -109,33 +113,32 @@
 
         <section class="chat-shell">
 
-            <!-- Title bar -->
+            <!-- Header -->
 
-            <div class="chat-titlebar">
+            <header class="chat-titlebar">
 
-                <div class="terminal-dots">
+                <div class="chat-heading">
 
-                    <span class="dot red"></span>
+                    <span class="chat-avatar" aria-hidden="true">
+                        <i class="fas fa-terminal"></i>
+                    </span>
 
-                    <span class="dot yellow"></span>
+                    <div class="chat-heading-text">
 
-                    <span class="dot green-dot"></span>
+                        <span class="chat-title">
+                            kaushix-ai
+                        </span>
+
+                        <span class="chat-subtitle">
+                            <span class="status-dot"></span>
+                            online
+                        </span>
+
+                    </div>
 
                 </div>
 
-                <span class="chat-title">
-                    kaushix-ai — chat
-                </span>
-
                 <div class="chat-tools">
-
-                    <span class="ai-status">
-
-                        <span class="status-dot"></span>
-
-                        API ONLINE
-
-                    </span>
 
                     <div class="ai-model">
 
@@ -167,13 +170,14 @@
 
                     </div>
 
-                    <button id="new-chat" class="chat-new" type="button" title="New chat">
-                        ↺
+                    <button id="new-chat" class="chat-new" type="button" title="New chat"
+                        aria-label="New chat">
+                        <i class="fas fa-plus"></i>
                     </button>
 
                 </div>
 
-            </div>
+            </header>
 
 
             <!-- Output -->
@@ -190,14 +194,10 @@
 
             <div class="chat-input-line">
 
-                <span class="terminal-prompt">
-                    kaushix@labs:~$
-                </span>
-
                 <textarea
                     id="prompt"
                     rows="1"
-                    placeholder="type a message… Enter to send"
+                    placeholder="Ask anything — code, research, or plain questions…"
                     aria-label="Message to Kaushix AI"
                 ></textarea>
 
@@ -235,9 +235,13 @@
                     and Innovation.
                 </p>
 
-                <p class="copyright">
-                    © 2026 Kaushix Labs. All Rights Reserved.
-                </p>
+            <p class="copyright">
+                © 2026 Kaushix Labs. All Rights Reserved.
+            </p>
+
+            <p class="copyright">
+                Built by <a class="founder-link" href="https://eskaykaushik.github.io/myProfile/" target="_blank" rel="noopener">Shubham Kaushik</a>
+            </p>
 
             </div>
 
@@ -306,9 +310,38 @@
         })();
     </script>
 
+    <!-- Mobile menu toggle -->
+
+    <script>
+        (function () {
+
+            const menuToggle = document.getElementById("menu-toggle");
+            const siteNav = document.getElementById("site-nav");
+
+            if (menuToggle && siteNav) {
+
+                menuToggle.addEventListener("click", () => {
+                    siteNav.classList.toggle("open");
+                    menuToggle.classList.toggle("active");
+                });
+
+                siteNav.addEventListener("click", (event) => {
+                    if (event.target.tagName === "A") {
+                        siteNav.classList.remove("open");
+                        menuToggle.classList.remove("active");
+                    }
+                });
+
+            }
+
+        })();
+    </script>
+
     <!-- Page JS -->
 
     <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <script src="../js/assistant.js"></script>
 

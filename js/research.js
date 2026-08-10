@@ -2,6 +2,10 @@
 // RESEARCH PROJECTS
 // ==========================================
 
+let researchProjects = [];
+let researchCategory = "all";
+let researchQuery = "";
+
 document.addEventListener("DOMContentLoaded", () => {
     loadResearchProjects();
 });
@@ -29,11 +33,11 @@ async function loadResearchProjects() {
 
         const data = await response.json();
 
-        container.innerHTML = "";
+        researchProjects = data.projects;
 
-        data.projects.forEach(project => {
-            container.appendChild(createProjectCard(project));
-        });
+        renderFilters();
+        bindSearch();
+        renderProjects();
 
     } catch (error) {
         console.error("Failed to load research projects:", error);
@@ -46,12 +50,95 @@ async function loadResearchProjects() {
     }
 }
 
+function renderFilters() {
+    const container = document.getElementById("research-filters");
+
+    if (!container) return;
+
+    const categories = [
+        "all",
+        ...new Set(researchProjects.flatMap(project =>
+            String(project.category || "")
+                .split("•")
+                .map(cat => cat.trim())
+                .filter(Boolean)
+        ))
+    ];
+
+    container.innerHTML = categories.map(category => `
+        <button class="filter-chip ${category === researchCategory ? "active" : ""}"
+                data-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
+    `).join("");
+
+    container.querySelectorAll(".filter-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+            researchCategory = chip.dataset.category;
+            renderFilters();
+            renderProjects();
+        });
+    });
+}
+
+function bindSearch() {
+    const input = document.getElementById("research-search");
+
+    if (!input) return;
+
+    input.addEventListener("input", event => {
+        researchQuery = event.target.value.trim().toLowerCase();
+        renderProjects();
+    });
+}
+
+function renderProjects() {
+    const container = document.getElementById("research-grid");
+
+    if (!container) return;
+
+    const filtered = researchProjects.filter(project => {
+        const matchesCategory = researchCategory === "all" ||
+            String(project.category || "")
+                .toLowerCase()
+                .includes(researchCategory.toLowerCase());
+
+        const haystack = [
+            project.title,
+            project.description,
+            project.category,
+            project.status,
+            ...(project.highlights || []),
+            ...(project.technologies || [])
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = !researchQuery || haystack.includes(researchQuery);
+
+        return matchesCategory && matchesSearch;
+    });
+
+    container.innerHTML = "";
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="research-empty">
+                <p class="terminal-path">$ no matches</p>
+                <p>No projects found${researchQuery ? ` for "${escapeHtml(researchQuery)}"` : ""}.</p>
+            </div>
+        `;
+        return;
+    }
+
+    filtered.forEach(project => {
+        container.appendChild(createProjectCard(project));
+    });
+}
+
 function createProjectCard(project) {
 
     const links = project.links || {};
 
     const external = [
         ["github", "GitHub"],
+        ["pypi", "PyPI"],
         ["paper", "Paper"],
         ["demo", "Demo"]
     ]
@@ -62,7 +149,7 @@ function createProjectCard(project) {
         `)
         .join("");
 
-    const firstLink = links.page || links.github || links.paper || links.demo;
+    const firstLink = links.page || links.github || links.pypi || links.paper || links.demo;
 
     const card = document.createElement(firstLink ? "a" : "div");
     card.className = "research-card";
@@ -77,7 +164,7 @@ function createProjectCard(project) {
         .join("");
 
     const status = (project.status || "Research").toUpperCase();
-    const statusClass = (project.status || "research").toLowerCase();
+    const statusClass = (project.status || "research").toLowerCase().replace(/\s+/g, "-");
 
     card.innerHTML = `
         <div class="terminal-bar">

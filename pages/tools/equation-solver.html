@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Equation Solver | Kaushix Labs Tools</title>
+
+    <meta name="description" content="Solve linear, quadratic, cubic and general equations step by step. A lightweight scientific tool from Kaushix Labs.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../css/tools.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <script>
+        document.documentElement.setAttribute(
+            "data-theme",
+            localStorage.getItem("theme") || "dark"
+        );
+    </script>
+</head>
+
+<body>
+
+    <header>
+
+        <div class="container navbar">
+
+            <a href="../../index.html" class="logo">
+                <span class="green">$</span> Kaushix Labs
+            </a>
+
+            <nav>
+                <a href="../../research.html">Research</a>
+                <a href="../../team.html">Our Team</a>
+                <a href="../../clients.html">Clients</a>
+                <a href="../../tools.html" class="active">Tools</a>
+                <a href="../../contact.html">Contact</a>
+                <a href="../assistant.html">AI</a>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                    ☾
+                </button>
+            </nav>
+
+        </div>
+
+    </header>
+
+    <main class="tool-page">
+
+        <div class="tool-body">
+
+            <a href="../../tools.html" class="tool-back">
+                ← $ cd ../tools
+            </a>
+
+            <div class="tool-panel">
+
+                <div class="tool-titlebar">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green-dot"></span>
+                    <span class="terminal-title">equation-solver — kaushix tools</span>
+                </div>
+
+                <div class="tool-form">
+
+                    <label for="equation-input">equation</label>
+
+                    <input
+                        id="equation-input"
+                        type="text"
+                        placeholder="x^2 - 5x + 6 = 0"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+
+                    <p class="hint">
+                        Supports linear, quadratic and cubic polynomials, plus general equations
+                        like sin(x) = 0.5. Use x, + − * / ^ ( ) pi e sin cos tan log ln exp sqrt.
+                    </p>
+
+                </div>
+
+                <div class="tool-actions">
+
+                    <button id="btn-solve" class="tool-btn" type="button">
+                        $ solve
+                    </button>
+
+                    <button id="btn-mind" class="tool-btn ghost" type="button">
+                        ⟶ solve with k-mind
+                    </button>
+
+                    <button id="btn-clear" class="tool-btn ghost" type="button">
+                        clear
+                    </button>
+
+                </div>
+
+                <div id="tool-output" class="tool-output" aria-live="polite">
+                    <div class="t-info">$ enter an equation and press solve…</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Theme toggle -->
+
+    <script>
+        (function () {
+
+            const toggle = document.getElementById("theme-toggle");
+
+            const setTheme = (theme) => {
+
+                document.documentElement.setAttribute("data-theme", theme);
+                localStorage.setItem("theme", theme);
+
+                if (toggle) {
+                    toggle.textContent = theme === "dark" ? "☀" : "☾";
+                }
+
+            };
+
+            if (toggle) {
+
+                toggle.addEventListener("click", () => {
+
+                    const current = document.documentElement.getAttribute("data-theme");
+
+                    setTheme(current === "dark" ? "light" : "dark");
+
+                });
+
+            }
+
+        })();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+
+    <script>
+        /* ==========================================
+           EQUATION SOLVER — Kaushix Labs Tools
+        ========================================== */
+
+        const API_URL = "https://kaushix-api-service.onrender.com";
+
+        const ALLOWED_FUNCS = new Set([
+            "x", "pi", "e", "sin", "cos", "tan",
+            "log", "ln", "exp", "sqrt", "abs"
+        ]);
+
+        const input = document.getElementById("equation-input");
+        const output = document.getElementById("tool-output");
+        const btnSolve = document.getElementById("btn-solve");
+        const btnMind = document.getElementById("btn-mind");
+        const btnClear = document.getElementById("btn-clear");
+
+        /* ---------- helpers ---------- */
+
+        function fmtNum(v) {
+            if (Math.abs(v) < 1e-12) return "0";
+            return String(parseFloat(v.toFixed(10)));
+        }
+
+        function snap(v) {
+            const r = Math.round(v * 1e8) / 1e8;
+            if (Math.abs(r - Math.round(r)) < 1e-9) return Math.round(r);
+            return r;
+        }
+
+        function polyStr(coeffs) {
+            // coeffs ascending: [d, c, b, a] → a·x³ + b·x² + c·x + d
+            const names = ["", "x", "x²", "x³", "x⁴", "x⁵"];
+            let out = "";
+            for (let i = coeffs.length - 1; i >= 0; i--) {
+                const v = coeffs[i];
+                if (Math.abs(v) < 1e-12) continue;
+                const a = Math.abs(v);
+                const term = i === 0
+                    ? fmtNum(a)
+                    : (i === 1 ? "x" : (Math.abs(a - 1) < 1e-9 ? names[i] : fmtNum(a) + names[i]));
+                if (!out) {
+                    out = (v < 0 ? "−" : "") + term;
+                } else {
+                    out += (v < 0 ? " − " : " + ") + term;
+                }
+            }
+            return out || "0";
+        }
+
+        function divisors(n) {
+            n = Math.abs(Math.round(n));
+            if (n === 0) return [1];
+            const out = [];
+            for (let i = 1; i <= n; i++) {
+                if (n % i === 0) out.push(i);
+            }
+            return out;
+        }
+
+        /* ---------- parsing ---------- */
+
+        function normalize(input) {
+            let s = input.trim();
+            if (!s) throw new Error("Please enter an equation.");
+            s = s.replace(/\s+/g, "");
+            if ((s.match(/=/g) || []).length > 1) {
+                throw new Error("Use a single '=' sign.");
+            }
+            s = s.replace(/\^/g, "**");
+            s = s.replace(/(\d)([a-zA-Z(])/g, "$1*$2");
+            s = s.replace(/\)([a-zA-Z(])/g, ")*$1");
+            s = s.replace(/\)(\d)/g, ")*$1");
+            return s;
+        }
+
+        function validate(expr) {
+            if (!/^[0-9a-z+\-*/^().\s]*$/.test(expr)) {
+                throw new Error("Unsupported characters. Use digits, + − * / ^ ( ) and x.");
+            }
+            const tokens = expr.split(/[^a-z]+/).filter(Boolean);
+            for (const t of tokens) {
+                if (!ALLOWED_FUNCS.has(t)) {
+                    throw new Error("Unknown symbol '" + t + "'. Use x, pi, e, sin, cos, tan, log, ln, exp, sqrt.");
+                }
+            }
+            let depth = 0;
+            for (const ch of expr) {
+                if (ch === "(") depth++;
+                if (ch === ")") depth--;
+                if (depth < 0) throw new Error("Unbalanced parentheses.");
+            }
+            if (depth !== 0) throw new Error("Unbalanced parentheses.");
+        }
+
+        function parseEquation(raw) {
+            const norm = normalize(raw);
+            const sides = norm.split("=");
+            const lhs = sides[0];
+            const rhs = sides.length === 2 ? sides[1] : "0";
+            if (!lhs) throw new Error("Nothing on the left of '='.");
+            validate(lhs);
+            validate(rhs);
+            const full = "(" + lhs + ") - (" + rhs + ")";
+            const compiled = compileMath(full);
+            const f = new Function("x", "\"use strict\"; return (" + compiled + ");");
+            return { full, f };
+        }
+
+        function compileMath(expr) {
+            const map = {
+                "pi": "Math.PI",
+                "e": "Math.E",
+                "sin": "Math.sin",
+                "cos": "Math.cos",
+                "tan": "Math.tan",
+                "log": "Math.log",
+                "ln": "Math.log",
+                "exp": "Math.exp",
+                "sqrt": "Math.sqrt",
+                "abs": "Math.abs"
+            };
+            return expr.replace(/[a-z]+/g, (word) => map[word] || word);
+        }
+
+        function detectDegree(expr) {
+            const matches = expr.match(/x\*\*(\d+)/g) || [];
+            let deg = 0;
+            for (const m of matches) {
+                deg = Math.max(deg, parseInt(m.split("**")[1], 10));
+            }
+            if (/x/.test(expr) && deg === 0) deg = 1;
+            return deg;
+        }
+
+        function isTranscendental(expr) {
+            return /\b(sin|cos|tan|log|ln|exp|sqrt|abs)\(/.test(expr);
+        }
+
+        /* ---------- linear algebra (coefficients) ---------- */
+
+        function gaussianSolve(A, b) {
+            const n = b.length;
+            for (let i = 0; i < n; i++) {
+                let piv = i;
+                for (let k = i + 1; k < n; k++) {
+                    if (Math.abs(A[k][i]) > Math.abs(A[piv][i])) piv = k;
+                }
+                [A[i], A[piv]] = [A[piv], A[i]];
+                [b[i], b[piv]] = [b[piv], b[i]];
+                if (Math.abs(A[i][i]) < 1e-12) return null;
+                for (let k = i + 1; k < n; k++) {
+                    const t = A[k][i] / A[i][i];
+                    for (let j = i; j < n; j++) A[k][j] -= t * A[i][j];
+                    b[k] -= t * b[i];
+                }
+            }
+            const x = new Array(n);
+            for (let i = n - 1; i >= 0; i--) {
+                let s = b[i];
+                for (let j = i + 1; j < n; j++) s -= A[i][j] * x[j];
+                x[i] = s / A[i][i];
+            }
+            return x;
+        }
+
+        function coeffs(f, n) {
+            const A = [];
+            const b = [];
+            for (let i = 0; i <= n; i++) {
+                const row = [];
+                for (let j = 0; j <= n; j++) row.push(Math.pow(i, j));
+                A.push(row);
+                b.push(f(i));
+            }
+            return gaussianSolve(A, b);
+        }
+
+        /* ---------- solvers ---------- */
+
+        function solveQuadratic(a, b, c, steps) {
+            const D = b * b - 4 * a * c;
+            steps.push({ type: "step", text: "Discriminant: D = b² − 4ac = " + fmtNum(D) });
+            if (D < -1e-9) {
+                const re = snap(-b / (2 * a));
+                const im = snap(Math.sqrt(-D) / (2 * a));
+                steps.push({ type: "step", text: "D < 0 → two complex conjugate roots." });
+                steps.push({ type: "answer", text: "x = " + fmtNum(re) + " ± " + fmtNum(im) + "i" });
+                return;
+            }
+            if (Math.abs(D) < 1e-9) {
+                const r = snap(-b / (2 * a));
+                steps.push({ type: "step", text: "D = 0 → one double root." });
+                steps.push({ type: "answer", text: "x = " + fmtNum(r) });
+                return;
+            }
+            const sd = Math.sqrt(D);
+            const r1 = snap((-b + sd) / (2 * a));
+            const r2 = snap((-b - sd) / (2 * a));
+            steps.push({ type: "step", text: "x = (−b ± √D) / 2a" });
+            steps.push({ type: "answer", text: "x₁ = " + fmtNum(r1) });
+            steps.push({ type: "answer", text: "x₂ = " + fmtNum(r2) });
+            if (Math.abs(sd - Math.round(sd)) < 1e-9) {
+                const term = (r) => (r < 0 ? "(x + " + fmtNum(-r) + ")" : "(x − " + fmtNum(r) + ")");
+                steps.push({ type: "info", text: "Factored: " + fmtNum(a) + term(r1) + term(r2) + " = 0" });
+            }
+        }
+
+        function solveCubic(a, b, c, d, f, steps) {
+            const candidates = new Set();
+            for (const p of divisors(d)) {
+                for (const q of divisors(a)) {
+                    candidates.add(p / q);
+                    candidates.add(-p / q);
+                }
+            }
+            const rational = [];
+            for (const cand of candidates) {
+                if (Math.abs(f(cand)) < 1e-7) rational.push(snap(cand));
+            }
+            const unique = [];
+            for (const r of rational) {
+                if (!unique.some(u => Math.abs(u - r) < 1e-9)) unique.push(r);
+            }
+
+            if (unique.length) {
+                steps.push({
+                    type: "info",
+                    text: "Rational root theorem — testing ±(factors of " + fmtNum(d) + " ÷ factors of " + fmtNum(a) + "):"
+                });
+                for (const r of unique) {
+                    steps.push({ type: "step", text: "Test x = " + fmtNum(r) + " → f(x) = 0 ✓" });
+                }
+                if (unique.length === 3) {
+                    steps.push({ type: "answer", text: "Roots: " + unique.map(fmtNum).join(", ") });
+                    return;
+                }
+                const r0 = unique[0];
+                const q2 = a;
+                const q1 = b + q2 * r0;
+                const q0 = c + q1 * r0;
+                const term = (r) => (r < 0 ? "(x + " + fmtNum(-r) + ")" : "(x − " + fmtNum(r) + ")");
+                steps.push({
+                    type: "step",
+                    text: "Factor out " + term(r0) + ": remaining quadratic " + polyStr([q0, q1, q2]) + " = 0"
+                });
+                solveQuadratic(q2, q1, q0, steps);
+                return;
+            }
+
+            steps.push({ type: "info", text: "No rational roots — falling back to numerical root finding." });
+            const num = numericalRoots(f);
+            if (!num.length) {
+                steps.push({ type: "error", text: "No real roots found in range [−100, 100]." });
+            } else {
+                steps.push({ type: "step", text: "Real roots:" });
+                num.forEach(r => steps.push({ type: "answer", text: "x ≈ " + fmtNum(r) }));
+            }
+        }
+
+        function safeF(f, x) {
+            try {
+                const v = f(x);
+                return Number.isFinite(v) ? v : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function numericalRoots(f) {
+            const roots = [];
+            const lo = -100, hi = 100, step = 0.5;
+            let prevX = lo;
+            let prevY = safeF(f, lo);
+            for (let x = lo + step; x <= hi; x += step) {
+                const y = safeF(f, x);
+                if (y !== null && prevY !== null && prevY * y < 0) {
+                    let a = prevX, b = x, fa = prevY;
+                    for (let i = 0; i < 80; i++) {
+                        const mid = (a + b) / 2;
+                        const fm = safeF(f, mid);
+                        if (fm === null) break;
+                        if (fa * fm <= 0) b = mid;
+                        else { a = mid; fa = fm; }
+                    }
+                    const r = snap((a + b) / 2);
+                    if (!roots.some(u => Math.abs(u - r) < 1e-9)) roots.push(r);
+                }
+                prevX = x;
+                prevY = y;
+            }
+            return roots;
+        }
+
+        /* ---------- main solve ---------- */
+
+        function solve(raw) {
+            const steps = [];
+            steps.push({ type: "info", text: "$ solve " + raw.trim().replace(/\s+/g, " ") });
+
+            const { full, f } = parseEquation(raw);
+            const degree = detectDegree(full);
+
+            if (isTranscendental(full)) {
+                steps.push({
+                    type: "info",
+                    text: "Transcendental equation — using numerical root finding (scan −100…100)."
+                });
+                const num = numericalRoots(f);
+                if (!num.length) {
+                    steps.push({ type: "error", text: "No real roots found in range [−100, 100]." });
+                } else {
+                    steps.push({ type: "step", text: "Real roots:" });
+                    num.forEach(r => steps.push({ type: "answer", text: "x ≈ " + fmtNum(r) }));
+                }
+                return steps;
+            }
+
+            if (degree === 0) {
+                const v = f(0);
+                if (Math.abs(v) < 1e-9) {
+                    steps.push({ type: "info", text: "Identity — the equation holds for every x." });
+                } else {
+                    steps.push({ type: "error", text: "Contradiction — no solution exists." });
+                }
+                return steps;
+            }
+
+            if (degree === 1) {
+                const c = coeffs(f, 1);
+                const a = c[1], b = c[0];
+                steps.push({ type: "step", text: "Linear: " + polyStr([b, a]) + " = 0" });
+                const r = snap(-b / a);
+                steps.push({ type: "step", text: "x = −b/a = " + fmtNum(r) });
+                steps.push({ type: "answer", text: "x = " + fmtNum(r) });
+                return steps;
+            }
+
+            if (degree === 2) {
+                const c = coeffs(f, 2);
+                const a = c[2], b = c[1], cc = c[0];
+                steps.push({ type: "step", text: "Quadratic: " + polyStr([cc, b, a]) + " = 0" });
+                solveQuadratic(a, b, cc, steps);
+                return steps;
+            }
+
+            if (degree === 3) {
+                const c = coeffs(f, 3);
+                const a = c[3], b = c[2], cc = c[1], d = c[0];
+                steps.push({ type: "step", text: "Cubic: " + polyStr([d, cc, b, a]) + " = 0" });
+                solveCubic(a, b, cc, d, f, steps);
+                return steps;
+            }
+
+            steps.push({
+                type: "info",
+                text: "Degree " + degree + " / non-polynomial — using numerical root finding."
+            });
+            const num = numericalRoots(f);
+            if (!num.length) {
+                steps.push({ type: "error", text: "No real roots found in range [−100, 100]." });
+            } else {
+                num.forEach(r => steps.push({ type: "answer", text: "x ≈ " + fmtNum(r) }));
+            }
+            return steps;
+        }
+
+        /* ---------- rendering ---------- */
+
+        function renderSteps(steps) {
+            output.innerHTML = "";
+            steps.forEach(s => {
+                const line = document.createElement("div");
+                line.className = "t-" + s.type;
+                line.textContent = (s.type === "info" ? "  " : s.type === "error" ? "! " : s.type === "answer" ? "✓ " : "⟶ ") + s.text;
+                output.appendChild(line);
+            });
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function renderLoading(text) {
+            output.innerHTML = "";
+            const line = document.createElement("div");
+            line.className = "t-loading";
+            line.textContent = "… " + text;
+            output.appendChild(line);
+        }
+
+        function runSolve() {
+            const raw = input.value.trim();
+            if (!raw) {
+                input.focus();
+                return;
+            }
+            try {
+                renderSteps(solve(raw));
+            } catch (e) {
+                renderSteps([{ type: "error", text: e.message }]);
+            }
+        }
+
+        async function runMind() {
+            const raw = input.value.trim();
+            if (!raw) {
+                input.focus();
+                return;
+            }
+            btnMind.disabled = true;
+            renderLoading("querying k-mind for a step-by-step solution…");
+            try {
+                const response = await fetch(
+                    API_URL.replace(/\/+$/, "") + "/api/reason",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            message: "Solve the equation " + raw + " step by step and explain each step. Keep the answer short."
+                        })
+                    }
+                );
+                if (!response.ok) {
+                    throw new Error("API request failed: " + response.status);
+                }
+                const data = await response.json();
+                output.innerHTML = marked.parse(data.response || "(no response)");
+            } catch (e) {
+                console.error("k-mind error:", e);
+                renderSteps([{ type: "error", text: e.message }]);
+            } finally {
+                btnMind.disabled = false;
+            }
+        }
+
+        /* ---------- events ---------- */
+
+        btnSolve.addEventListener("click", runSolve);
+        btnMind.addEventListener("click", runMind);
+        btnClear.addEventListener("click", () => {
+            input.value = "";
+            renderSteps([{ type: "info", text: "$ enter an equation and press solve…" }]);
+            input.focus();
+        });
+
+        input.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                runSolve();
+            }
+        });
+
+        input.focus();
+    </script>
+
+</body>
+
+</html>

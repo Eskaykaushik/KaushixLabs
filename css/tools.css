@@ -1,0 +1,255 @@
+/* ==========================================
+   TOOLS HUB
+========================================== */
+
+.tool-card .card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .7rem;
+}
+
+.tool-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    border: 1px solid var(--green);
+    color: var(--green);
+    background: var(--term-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    box-shadow: 0 0 16px rgba(63, 185, 80, .15);
+}
+
+.tool-status {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: .25rem .6rem;
+    border-radius: 999px;
+    font-size: .68rem;
+}
+
+/* ==========================================
+   TOOL PAGE (shared)
+========================================== */
+
+.tool-page {
+    padding: 0 0 3rem;
+}
+
+.tool-body {
+    max-width: 780px;
+    margin: 2rem auto 4rem;
+}
+
+.tool-back {
+    display: inline-block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .78rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    text-decoration: none;
+    transition: color .3s var(--ease);
+}
+
+.tool-back:hover {
+    color: var(--green);
+}
+
+.tool-panel {
+    background: var(--term-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 16px 44px rgba(0, 0, 0, .3);
+}
+
+.tool-titlebar {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    padding: .8rem 1.1rem;
+    background: var(--term-surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.tool-titlebar .terminal-title {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .75rem;
+    color: var(--muted);
+}
+
+.tool-form {
+    padding: 1.3rem 1.3rem .5rem;
+}
+
+.tool-form label {
+    display: block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .7rem;
+    letter-spacing: .12em;
+    color: var(--green);
+    margin-bottom: .55rem;
+}
+
+.tool-form input[type="text"] {
+    width: 100%;
+    background: var(--term-surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .85rem 1rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .95rem;
+    outline: none;
+    transition: border-color .3s var(--ease), box-shadow .3s var(--ease);
+}
+
+.tool-form input[type="text"]:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(63, 185, 80, .12);
+}
+
+.tool-form .hint {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .7rem;
+    color: var(--muted);
+    margin-top: .55rem;
+}
+
+.tool-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .7rem;
+    padding: 1.1rem 1.3rem;
+}
+
+.tool-btn {
+    background: transparent;
+    color: var(--green);
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    padding: .6rem 1.3rem;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+    font-size: .78rem;
+    letter-spacing: .08em;
+    cursor: pointer;
+    transition: background-color .3s var(--ease), color .3s var(--ease), box-shadow .3s var(--ease);
+}
+
+.tool-btn:hover:not(:disabled) {
+    background: var(--green);
+    color: #000;
+    box-shadow: 0 0 18px rgba(63, 185, 80, .35);
+}
+
+.tool-btn.ghost {
+    border-color: var(--border);
+    color: var(--muted);
+}
+
+.tool-btn.ghost:hover:not(:disabled) {
+    border-color: var(--red);
+    color: var(--red);
+    background: transparent;
+    box-shadow: none;
+}
+
+.tool-btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.tool-output {
+    margin: .25rem 1.3rem 1.3rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #010409;
+    padding: 1rem 1.1rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .85rem;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 90px;
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+.tool-output .t-step {
+    color: var(--text);
+}
+
+.tool-output .t-answer {
+    color: var(--green);
+    font-weight: 700;
+}
+
+.tool-output .t-info {
+    color: var(--muted);
+}
+
+.tool-output .t-error {
+    color: var(--red);
+}
+
+.tool-output .t-loading {
+    color: var(--muted);
+}
+
+.tool-output pre {
+    background: var(--term-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .8rem 1rem;
+    overflow-x: auto;
+    margin: .6rem 0;
+    font-size: .8rem;
+    line-height: 1.6;
+}
+
+.tool-output code {
+    font-family: "JetBrains Mono", monospace;
+    background: var(--term-surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: .1rem .3rem;
+    font-size: .85em;
+}
+
+.tool-output pre code {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+}
+
+@media (max-width: 600px) {
+
+    .tool-body {
+        margin: 1.25rem auto 2.5rem;
+    }
+
+    .tool-form {
+        padding: 1.1rem 1rem .4rem;
+    }
+
+    .tool-actions {
+        padding: .9rem 1rem;
+    }
+
+    .tool-output {
+        margin: .25rem 1rem 1rem;
+    }
+
+    .tool-btn {
+        flex: 1;
+        text-align: center;
+    }
+
+}

@@ -715,6 +715,148 @@ justify-content:center;
    RESEARCH GRID
 ========================================== */
 
+.research-toolbar{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:1.25rem;
+
+    margin:2rem 0 1rem;
+
+}
+
+.search-box{
+
+    position:relative;
+
+    max-width:420px;
+
+}
+
+.search-box i{
+
+    position:absolute;
+
+    left:1rem;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    color:var(--muted);
+
+    font-size:.9rem;
+
+    pointer-events:none;
+
+}
+
+.search-box input{
+
+    width:100%;
+
+    padding:.8rem 1rem .8rem 2.6rem;
+
+    background:var(--surface);
+
+    border:1px solid var(--border);
+
+    border-radius:10px;
+
+    color:var(--text);
+
+    font-family:"JetBrains Mono",monospace;
+
+    font-size:.9rem;
+
+    transition:border-color .3s var(--ease), box-shadow .3s var(--ease);
+
+}
+
+.search-box input::placeholder{
+
+    color:var(--muted);
+
+}
+
+.search-box input:focus{
+
+    outline:none;
+
+    border-color:var(--green);
+
+    box-shadow:0 0 0 3px rgba(34,197,94,.15);
+
+}
+
+.filter-chips{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:.5rem;
+
+}
+
+.filter-chip{
+
+    font-size:.75rem;
+
+    padding:.4rem .9rem;
+
+    border:1px solid var(--border);
+
+    border-radius:999px;
+
+    background:transparent;
+
+    color:var(--muted);
+
+    font-family:"JetBrains Mono",monospace;
+
+    cursor:pointer;
+
+    transition:all .3s var(--ease);
+
+}
+
+.filter-chip:hover{
+
+    border-color:var(--green);
+
+    color:var(--green);
+
+}
+
+.filter-chip.active{
+
+    background:var(--green);
+
+    border-color:var(--green);
+
+    color:black;
+
+}
+
+.research-empty{
+
+    grid-column:1 / -1;
+
+    text-align:center;
+
+    padding:3rem 1rem;
+
+    color:var(--muted);
+
+    border:1px dashed var(--border);
+
+    border-radius:12px;
+
+}
+
 .research-grid{
 
     display:grid;
@@ -899,6 +1041,14 @@ justify-content:center;
 
 }
 
+.status.open-source{
+
+    background:rgba(34,197,94,.12);
+
+    color:var(--green);
+
+}
+
 
 /* ==========================================
    TAGS
@@ -1063,6 +1213,18 @@ justify-content:center;
 .copyright{
     margin-top:15px;
     font-size:14px;
+}
+
+.founder-link{
+    color:#22c55e;
+    text-decoration:none;
+    font-weight:500;
+    transition:color .3s ease;
+}
+
+.founder-link:hover{
+    color:#fff;
+    text-decoration:underline;
 }
 
 .footer-right h4{
