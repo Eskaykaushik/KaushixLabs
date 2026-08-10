@@ -1,5 +1,5 @@
 /* ==========================================
-   Kaushix AI — Claude-style terminal chat
+   Kaushix AI — DocNest-style chat
 ========================================== */
 
 const API_URL =
@@ -13,7 +13,8 @@ const ENDPOINTS = {
     compound: "/api/compound"
 };
 
-const PROMPT = "kaushix@labs:~$";
+const AI_NAME = "kaushix-ai";
+const USER_NAME = "you";
 
 const SUGGESTIONS = [
     "Explain how a transformer model works in simple terms",
@@ -21,6 +22,9 @@ const SUGGESTIONS = [
     "Summarize the key ideas of machine learning in one paragraph",
     "Give me 5 ideas for AI startup projects"
 ];
+
+const STREAM_CHUNK = 3;
+const STREAM_TICK_MS = 10;
 
 
 /* ==========================================
@@ -39,6 +43,7 @@ const newChatButton = document.getElementById("new-chat");
 ========================================== */
 
 let userNearBottom = true;
+let streamTimer = null;
 
 
 function isNearBottom() {
@@ -50,9 +55,16 @@ function isNearBottom() {
 }
 
 
-function scrollToBottom() {
+function scrollToBottom({ smooth = true } = {}) {
 
-    chatOutput.scrollTop = chatOutput.scrollHeight;
+    if (!userNearBottom) {
+        return;
+    }
+
+    chatOutput.scrollTo({
+        top: chatOutput.scrollHeight,
+        behavior: smooth ? "smooth" : "instant"
+    });
 
 }
 
@@ -81,6 +93,99 @@ function makeAvatar() {
 }
 
 
+function escapeHtml(text) {
+
+    const div = document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+
+}
+
+
+/* ==========================================
+   Markdown rendering (marked + highlight.js)
+========================================== */
+
+const renderer = new marked.Renderer();
+
+renderer.code = (code, infoString) => {
+
+    const language = (infoString || "text").trim().split(/\s+/)[0];
+    const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
+    const highlighted = hljs.highlight(code, { language: validLanguage }).value;
+    const label = hljs.getLanguage(language)
+        ? hljs.getLanguage(language).name
+        : (validLanguage === "plaintext" ? "text" : validLanguage);
+
+    return `
+        <div class="code-block">
+            <div class="code-block-header">
+                <span class="code-lang">${escapeHtml(label)}</span>
+                <button type="button" class="copy-btn" data-code="${encodeURIComponent(code)}">
+                    <i class="far fa-copy"></i>
+                    <span class="copy-label">Copy</span>
+                </button>
+            </div>
+            <pre><code class="hljs language-${validLanguage}">${highlighted}</code></pre>
+        </div>
+    `;
+
+};
+
+
+function renderMarkdown(text) {
+
+    marked.setOptions({
+        gfm: true,
+        breaks: false,
+        renderer: renderer
+    });
+
+    return marked.parse(text);
+
+}
+
+
+function initCopyButtons(container) {
+
+    const buttons = container.querySelectorAll(".copy-btn:not([data-bound])");
+
+    buttons.forEach((button) => {
+
+        button.setAttribute("data-bound", "true");
+
+        button.addEventListener("click", () => {
+
+            const code = decodeURIComponent(button.dataset.code || "");
+            const label = button.querySelector(".copy-label");
+
+            navigator.clipboard.writeText(code).then(() => {
+                button.classList.add("copied");
+                if (label) {
+                    label.textContent = "Copied";
+                }
+            }).catch(() => {
+                if (label) {
+                    label.textContent = "Failed";
+                }
+            }).then(() => {
+                setTimeout(() => {
+                    button.classList.remove("copied");
+                    if (label) {
+                        label.textContent = "Copy";
+                    }
+                }, 1800);
+            });
+
+        });
+
+    });
+
+}
+
+
 /* ==========================================
    Welcome screen
 ========================================== */
@@ -88,6 +193,7 @@ function makeAvatar() {
 function renderWelcome() {
 
     chatOutput.innerHTML = "";
+    clearStream();
 
     const welcome = el("div", "welcome");
 
@@ -105,11 +211,13 @@ function renderWelcome() {
 
     const chips = el("div", "chips");
 
-    SUGGESTIONS.forEach((suggestion) => {
+    SUGGESTIONS.forEach((suggestion, index) => {
 
         const chip = el("button", "chip");
 
         chip.type = "button";
+
+        chip.style.setProperty("--i", index);
 
         chip.textContent = suggestion;
 
@@ -141,11 +249,20 @@ function addUserMessage(text) {
 
     const msg = el("div", "msg msg-user");
 
-    const bubble = el("div", "msg-bubble");
+    const body = el("div", "msg-body");
+
+    const name = el("div", "msg-name");
+
+    name.textContent = USER_NAME;
+
+    const bubble = el("div", "msg-text");
 
     bubble.textContent = text;
 
-    msg.appendChild(bubble);
+    body.appendChild(name);
+    body.appendChild(bubble);
+
+    msg.appendChild(body);
 
     chatOutput.appendChild(msg);
 
@@ -162,7 +279,7 @@ function addAssistantMessage(modelLabel) {
 
     const name = el("div", "msg-name");
 
-    name.textContent = "kaushix-ai · " + modelLabel;
+    name.textContent = AI_NAME + " · " + modelLabel;
 
     const text = el("div", "msg-text");
 
@@ -187,7 +304,7 @@ function addTypingIndicator() {
 
     const body = el("div", "msg-body");
 
-    const dots = el("div", "typing-dots");
+    const dots = el("div", "typing");
 
     dots.innerHTML = "<span></span><span></span><span></span>";
 
@@ -213,7 +330,7 @@ function addError(message) {
 
     const name = el("div", "msg-name");
 
-    name.textContent = "kaushix-ai · error";
+    name.textContent = AI_NAME + " · error";
 
     const text = el("div", "msg-text msg-error");
 
@@ -232,61 +349,52 @@ function addError(message) {
 }
 
 
-function typeText(text, container) {
+function streamResponse(container, fullText) {
 
     return new Promise((resolve) => {
 
-        const cursor = el("span", "block-cursor");
+        clearStream();
 
-        let i = 0;
+        let index = 0;
 
-        let buffer = "";
+        container.classList.add("streaming");
 
-        const render = () => {
+        streamTimer = setInterval(() => {
 
-            container.innerHTML = marked.parse(buffer);
+            index += STREAM_CHUNK;
 
-            container.appendChild(cursor);
+            container.textContent = fullText.slice(0, index);
 
-        };
+            scrollToBottom({ smooth: false });
 
-        render();
+            if (index >= fullText.length) {
 
-        const step = () => {
+                clearInterval(streamTimer);
+                streamTimer = null;
 
-            if (i < text.length) {
+                container.innerHTML = renderMarkdown(fullText);
+                initCopyButtons(container);
+                container.classList.remove("streaming");
 
-                buffer += text[i];
-
-                i++;
-
-                render();
-
-                if (userNearBottom) {
-
-                    scrollToBottom();
-
-                }
-
-                setTimeout(step, 8);
-
-            } else {
-
-                if (userNearBottom) {
-
-                    scrollToBottom();
-
-                }
+                scrollToBottom();
 
                 resolve();
 
             }
 
-        };
-
-        step();
+        }, STREAM_TICK_MS);
 
     });
+
+}
+
+
+function clearStream() {
+
+    if (streamTimer) {
+        clearInterval(streamTimer);
+        streamTimer = null;
+    }
 
 }
 
@@ -373,11 +481,13 @@ async function sendMessage(preset) {
 
         const textEl = addAssistantMessage(label);
 
-        await typeText(answer, textEl);
+        await streamResponse(textEl, answer);
 
     } catch (error) {
 
         console.error("Assistant error:", error);
+
+        clearStream();
 
         typing.remove();
 
